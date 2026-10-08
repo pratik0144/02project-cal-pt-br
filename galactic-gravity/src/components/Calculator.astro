@@ -1,0 +1,1111 @@
+---
+/**
+ * Calculator.astro: Calculadora de Horas Extras – Brasil (CLT)
+ * Sem seleção de estado. Multiplicador fixo 1,5× (configurável).
+ * Inclui seção DSR e exportação PDF.
+ */
+interface Props {
+  hideTitle?: boolean;
+}
+const { hideTitle = false } = Astro.props;
+---
+
+<section id="calculator" class="py-6 sm:py-8 lg:py-10 flex-1">
+  <div class="section-container">
+    {!hideTitle && (
+      <div class="text-center mb-6">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl">Calculadora de Horas Extras</h1>
+        <p class="mt-2 text-sm sm:text-base max-w-lg mx-auto" style="color: var(--color-g-body);">
+          Insira seu salário/hora e as horas trabalhadas para calcular suas horas extras automaticamente.
+        </p>
+      </div>
+    )}
+
+    <div class="card-lg max-w-5xl mx-auto">
+      <!-- Controls Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+        <!-- Overtime Multiplier -->
+        <div>
+          <label class="calc-label">Multiplicador de Hora Extra</label>
+          <div class="flex flex-wrap gap-1.5" id="mult-btns">
+            <button data-mult="1.5" class="mult-btn mult-active">50% (1,5×)</button>
+            <button data-mult="2" class="mult-btn">100% (2×)</button>
+            <button data-mult="custom" class="mult-btn">Personalizado</button>
+          </div>
+          <div id="custom-mult-wrap" class="hidden mt-2">
+            <input type="number" id="custom-mult" class="calc-input" value="1.75" min="1" max="4" step="0.05" style="max-width: 140px;" aria-label="Multiplicador personalizado" />
+          </div>
+        </div>
+        <!-- Rate -->
+        <div>
+          <label for="hourly-rate" class="calc-label">Salário/Hora Base</label>
+          <div class="flex items-center gap-3">
+            <div class="relative flex-1">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 13px; font-weight: 500;">R$</span>
+              <input type="number" id="hourly-rate" min="1" max="1000" step="0.50" value="20.00" class="calc-input" style="padding-left: 34px;" />
+            </div>
+            <input
+              type="range"
+              id="rate-slider"
+              min="7.00"
+              max="200"
+              step="0.50"
+              value="20"
+              class="calc-slider flex-1 cursor-pointer hidden sm:block"
+              aria-label="Controle deslizante de salário/hora"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Rule Badge -->
+      <div class="flex items-center gap-2 mb-5 flex-wrap">
+        <span class="mono-eyebrow">REGRA ATIVA</span>
+        <span id="rule-badge" class="rule-badge">CLT Art. 59 – Hora Extra 50% após 44h/semana</span>
+      </div>
+
+      <!-- Presets -->
+      <div class="mb-5">
+        <p class="mono-eyebrow mb-2">PREDEFINIÇÕES RÁPIDAS</p>
+        <div class="flex flex-wrap gap-1.5">
+          <button data-preset="standard" class="preset-btn preset-active">Padrão CLT 5×8</button>
+          <button data-preset="sixday" class="preset-btn">6×8h</button>
+          <button data-preset="extended" class="preset-btn">5×10h</button>
+          <button data-preset="twelve36" class="preset-btn">Jornada 12×36</button>
+          <button data-preset="clear" class="preset-btn">Limpar</button>
+        </div>
+      </div>
+
+      <!-- Weekly Hours Grid -->
+      <div class="mb-6">
+        <div class="grid grid-cols-7 gap-[6px] sm:gap-3" id="hours-grid">
+          {['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'].map((day, i) => (
+            <div class="flex flex-col items-center">
+              <span class="day-label">{day}</span>
+              <div class="day-cell">
+                <button class="hour-btn hour-btn-up" data-day={i} data-action="increase" aria-label={`Aumentar ${day}`}>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M5 1.5v7M1.5 5h7"/></svg>
+                </button>
+                <input
+                  type="number"
+                  class="day-input"
+                  data-day={i}
+                  value={i < 5 ? '8' : '0'}
+                  min="0"
+                  max="24"
+                  step="1"
+                  inputmode="numeric"
+                  aria-label={`${day} horas`}
+                />
+                <button class="hour-btn hour-btn-down" data-day={i} data-action="decrease" aria-label={`Diminuir ${day}`}>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M1.5 5h7"/></svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p class="text-center text-xs mt-2" style="color: var(--color-g-mute);">
+          Total: <span id="total-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span> hrs/semana
+        </p>
+      </div>
+
+      <!-- DSR Section (collapsed by default) -->
+      <div id="dsr-section" class="mb-5">
+        <button id="dsr-toggle-btn" type="button" class="flex items-center gap-2 w-full text-left py-1 cursor-pointer" style="background:none;border:none;">
+          <span class="mono-eyebrow">DSR SOBRE HORAS EXTRAS</span>
+          <svg class="dsr-chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div id="dsr-panel" class="hidden mt-3 p-4 rounded-lg" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline);">
+          <div class="flex items-center gap-3 mb-3">
+            <label class="calc-label" style="margin-bottom:0;">Incluir DSR</label>
+            <button id="dsr-switch" type="button" role="switch" aria-checked="false" class="dsr-switch">
+              <span class="dsr-switch-thumb"></span>
+            </button>
+          </div>
+          <div id="dsr-inputs" class="hidden grid grid-cols-2 gap-3">
+            <div>
+              <label for="dsr-work-days" class="calc-label">Dias úteis no mês</label>
+              <input type="number" id="dsr-work-days" class="calc-input" value="22" min="1" max="31" />
+            </div>
+            <div>
+              <label for="dsr-sundays" class="calc-label">Domingos e feriados</label>
+              <input type="number" id="dsr-sundays" class="calc-input" value="8" min="0" max="15" />
+            </div>
+          </div>
+          <p id="dsr-formula" class="hidden text-xs mt-3" style="color: var(--color-g-mute); font-family: var(--font-mono);">
+            DSR = (Total HE ÷ Dias Úteis) × Domingos/Feriados
+          </p>
+        </div>
+      </div>
+
+      <!-- Period Multiplier -->
+      <div class="flex items-center gap-2 mb-5 flex-wrap">
+        <span class="mono-eyebrow">MOSTRAR PAGAMENTO PARA</span>
+        <div class="flex gap-1" id="period-btns">
+          <button data-period="1" class="period-btn period-active">1 Semana</button>
+          <button data-period="2" class="period-btn">2 Semanas</button>
+          <button data-period="4" class="period-btn">Mensal</button>
+          <button data-period="52" class="period-btn">Anual</button>
+        </div>
+      </div>
+
+      <!-- Pay Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6" id="pay-cards">
+        <div class="pay-card" style="border: 2px solid color-mix(in srgb, var(--color-g-gross) 30%, transparent); background: color-mix(in srgb, var(--color-g-gross) 8%, var(--color-g-elevated));">
+          <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-gross);">REMUNERAÇÃO BRUTA</p>
+          <p class="pay-amount" id="gross-pay">R$&nbsp;800,00</p>
+          <p class="pay-sub"><span id="gross-hours" class="font-mono">40</span>h total</p>
+        </div>
+        <div class="pay-card pay-card-border">
+          <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-straight);">NORMAL (1×)</p>
+          <p class="pay-amount" id="straight-pay">R$&nbsp;800,00</p>
+          <p class="pay-sub"><span id="straight-hours" class="font-mono">40</span>h</p>
+        </div>
+        <div class="pay-card pay-card-border">
+          <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-overtime);">HORA EXTRA (<span id="mult-label-card">1,5</span>×)</p>
+          <p class="pay-amount" id="overtime-pay">R$&nbsp;0,00</p>
+          <p class="pay-sub"><span id="overtime-hours" class="font-mono">0</span>h</p>
+        </div>
+        <div class="pay-card pay-card-border" id="dsr-card" style="display:none;">
+          <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-doubletime);">DSR SOBRE HE</p>
+          <p class="pay-amount" id="dsr-pay">R$&nbsp;0,00</p>
+          <p class="pay-sub">Ref. <span id="dsr-ref-days" class="font-mono">8</span> dias</p>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-wrap">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <h3 class="text-sm font-semibold" style="color: var(--color-g-ink);">Ganhos Diários</h3>
+          <span id="period-label" class="mono-eyebrow">Por Semana</span>
+        </div>
+        <div class="relative" style="height: 180px;">
+          <canvas id="earnings-chart" class="w-full h-full"></canvas>
+          <div id="chart-tooltip" class="chart-tooltip hidden"></div>
+        </div>
+        <div class="flex items-center justify-center gap-4 sm:gap-6 mt-3 flex-wrap">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full" style="background: var(--color-g-straight);"></span>
+            <span class="legend-text">Normal (1×)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full" style="background: var(--color-g-overtime);"></span>
+            <span class="legend-text">Hora Extra (<span id="mult-label-legend">1,5</span>×)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Export + Disclaimer -->
+    <div class="flex flex-col items-center gap-2 mt-4 max-w-lg mx-auto">
+      <button id="export-pdf-btn" type="button" class="export-pdf-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Exportar como PDF
+      </button>
+      <p class="text-center text-[11px] italic" style="color: var(--color-g-faint);">
+        Estimativas para empregados não isentos típicos. Não constitui assessoria jurídica, fiscal ou de folha de pagamento.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── Form controls ── */
+  .calc-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--color-g-ink);
+  }
+  .calc-select,
+  .calc-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: var(--color-g-ink);
+    background: var(--color-g-elevated);
+    border: 1px solid var(--color-g-hairline);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s;
+  }
+  .calc-select:focus,
+  .calc-input:focus {
+    outline: none;
+    border-color: var(--color-g-link);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-g-link) 20%, transparent);
+  }
+
+  /* ── Rate Slider ── */
+  .calc-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-g-ink) 20%, var(--color-g-hairline));
+    outline: none;
+    cursor: pointer;
+    margin: 0;
+    transition: background 0.1s ease;
+  }
+  .calc-slider:focus-visible {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-g-link) 35%, transparent);
+  }
+  .calc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-g-elevated);
+    border: 2px solid var(--color-g-link);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+  }
+  .calc-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: var(--color-g-link);
+  }
+  .calc-slider::-webkit-slider-thumb:active {
+    transform: scale(1.05);
+  }
+  .calc-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-g-elevated);
+    border: 2px solid var(--color-g-link);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+  }
+  .calc-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    background: var(--color-g-link);
+  }
+  .calc-slider::-moz-range-track {
+    height: 6px;
+    border-radius: 9999px;
+    background: transparent;
+    border: none;
+  }
+
+  .rule-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    border-radius: 100px;
+    background: color-mix(in srgb, var(--color-g-link) 10%, transparent);
+    color: var(--color-g-link);
+  }
+
+  /* ── Multiplier buttons ── */
+  .mult-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-g-hairline);
+    background: var(--color-g-elevated);
+    color: var(--color-g-ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .mult-btn:hover { border-color: var(--color-g-mute); }
+  .mult-active {
+    background: var(--color-g-ink);
+    color: var(--color-g-on-primary);
+    border-color: var(--color-g-ink);
+  }
+  .mult-active:hover { opacity: 0.85; }
+
+  /* ── Day cells ── */
+  .day-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    color: var(--color-g-mute);
+    font-family: var(--font-mono);
+  }
+  @media (min-width: 640px) {
+    .day-label { font-size: 11px; }
+  }
+  .day-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: 6px 2px;
+    background: var(--color-g-canvas);
+    border: 1px solid var(--color-g-hairline);
+    border-radius: 16px;
+  }
+  @media (min-width: 640px) {
+    .day-cell {
+      padding: 10px 4px;
+      gap: 6px;
+    }
+  }
+  .day-input {
+    width: 100%;
+    max-width: 48px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--color-g-ink);
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 2px 0;
+    -moz-appearance: textfield;
+  }
+  .day-input::-webkit-outer-spin-button,
+  .day-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .day-input:focus {
+    background: var(--color-g-elevated);
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-g-link) 25%, transparent);
+  }
+  @media (min-width: 640px) {
+    .day-input { font-size: 24px; max-width: 56px; }
+  }
+  .hour-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: var(--color-g-mute);
+    background: var(--color-g-elevated);
+    border: 1px solid var(--color-g-hairline);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    position: relative;
+  }
+  .hour-btn::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+  }
+  @media (min-width: 640px) {
+    .hour-btn {
+      width: 28px;
+      height: 28px;
+    }
+  }
+  .hour-btn:hover {
+    color: var(--color-g-link);
+    border-color: var(--color-g-link);
+    background: color-mix(in srgb, var(--color-g-link) 8%, var(--color-g-elevated));
+    transform: scale(1.08);
+  }
+  .hour-btn:active {
+    transform: scale(0.92);
+  }
+
+  /* ── Presets ── */
+  .preset-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: var(--radius-pill-cat);
+    border: 1px solid var(--color-g-hairline);
+    background: var(--color-g-elevated);
+    color: var(--color-g-ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .preset-btn:hover { border-color: var(--color-g-mute); }
+  .preset-active {
+    background: var(--color-g-ink);
+    color: var(--color-g-on-primary);
+    border-color: var(--color-g-ink);
+  }
+  .preset-active:hover { opacity: 0.85; }
+
+  /* ── Period buttons ── */
+  .period-btn {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    border-radius: var(--radius-pill-cat);
+    border: 1px solid var(--color-g-hairline);
+    background: var(--color-g-elevated);
+    color: var(--color-g-body);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .period-btn:hover { border-color: var(--color-g-mute); }
+  .period-active {
+    background: var(--color-g-ink);
+    color: var(--color-g-on-primary);
+    border-color: var(--color-g-ink);
+  }
+
+  /* ── Pay cards ── */
+  .pay-card {
+    padding: 12px;
+    border-radius: var(--radius-md);
+  }
+  @media (min-width: 640px) { .pay-card { padding: 16px; } }
+  .pay-card-border {
+    border: 1px solid var(--color-g-hairline);
+    background: var(--color-g-elevated);
+  }
+  .pay-amount {
+    font-size: 20px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--color-g-ink);
+  }
+  @media (min-width: 640px) { .pay-amount { font-size: 24px; } }
+  .pay-sub {
+    font-size: 11px;
+    margin-top: 2px;
+    color: var(--color-g-mute);
+  }
+
+  /* ── Chart ── */
+  .chart-wrap {
+    padding: 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-g-hairline);
+    background: var(--color-g-elevated);
+  }
+  @media (min-width: 640px) { .chart-wrap { padding: 20px; } }
+  .chart-tooltip {
+    position: absolute;
+    padding: 8px 12px;
+    background: var(--color-g-ink);
+    color: var(--color-g-on-primary);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateX(-50%);
+    line-height: 1.5;
+  }
+  .legend-text { font-size: 11px; color: var(--color-g-body); }
+
+  /* ── DSR toggle ── */
+  .dsr-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--color-g-hairline);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .dsr-switch[aria-checked='true'] {
+    background: var(--color-g-link);
+  }
+  .dsr-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .dsr-switch[aria-checked='true'] .dsr-switch-thumb {
+    transform: translateX(16px);
+  }
+  .dsr-chevron {
+    transition: transform 0.2s;
+    color: var(--color-g-mute);
+    flex-shrink: 0;
+  }
+  #dsr-section.dsr-open .dsr-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* ── Export PDF button ── */
+  .export-pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-g-hairline);
+    background: var(--color-g-elevated);
+    color: var(--color-g-ink);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .export-pdf-btn:hover {
+    border-color: var(--color-g-link);
+    color: var(--color-g-link);
+  }
+
+  /* Print styles not needed — PDF opens in separate window */
+</style>
+
+<script>
+  // ── Types ──
+  interface D { day: string; hours: number }
+  interface DB { day: string; hours: number; straight: number; overtime: number; straightPay: number; overtimePay: number; totalPay: number }
+  interface R { totalHours: number; straightHours: number; overtimeHours: number; straightPay: number; overtimePay: number; grossPay: number; dailyBreakdown: DB[]; stateRule: string }
+
+  // ── Engine: simple weekly threshold (CLT) ──
+  function calcBrazil(days: D[], rate: number, threshold: number, mult: number): R {
+    const tot = days.reduce((s, d) => s + d.hours, 0);
+    const ot = Math.max(0, tot - threshold);
+    const str = tot - ot;
+    let rem = str;
+    const db: DB[] = days.map(d => {
+      const ds = Math.min(d.hours, rem);
+      const dot = d.hours - ds;
+      rem -= ds;
+      return {
+        day: d.day, hours: d.hours, straight: ds, overtime: dot,
+        straightPay: ds * rate, overtimePay: dot * rate * mult,
+        totalPay: ds * rate + dot * rate * mult
+      };
+    });
+    return {
+      totalHours: tot, straightHours: str, overtimeHours: ot,
+      straightPay: str * rate, overtimePay: ot * rate * mult,
+      grossPay: str * rate + ot * rate * mult,
+      dailyBreakdown: db,
+      stateRule: mult === 1.5
+        ? 'CLT Art. 59 – Hora Extra 50% após 44h/semana'
+        : mult === 2
+          ? 'CLT Art. 59 – Hora Extra 100% (domingos/feriados)'
+          : `Multiplicador Personalizado: ${mult.toFixed(2).replace('.', ',')}×`
+    };
+  }
+
+  // ── Helpers ──
+  const $ = (id: string) => document.getElementById(id)!;
+  const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(n);
+
+  // ── State ──
+  const dayNames = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+  let hours = [8, 8, 8, 8, 8, 0, 0];
+  let period = 1;
+  let multiplier = 1.5;
+  let dsrEnabled = false;
+  const THRESHOLD = 44; // CLT standard weekly threshold
+
+  const presets: Record<string, number[]> = {
+    standard: [8, 8, 8, 8, 8, 0, 0],
+    sixday:   [8, 8, 8, 8, 8, 8, 0],
+    extended: [10, 10, 10, 10, 10, 0, 0],
+    twelve36: [12, 0, 12, 0, 12, 0, 12],
+    clear:    [0, 0, 0, 0, 0, 0, 0],
+  };
+
+  // ── DOM ──
+  const rateIn = $('hourly-rate') as HTMLInputElement;
+  const slider = $('rate-slider') as HTMLInputElement;
+  const dayInputs = document.querySelectorAll('.day-input') as NodeListOf<HTMLInputElement>;
+  const canvas = $('earnings-chart') as HTMLCanvasElement;
+  const customMultWrap = $('custom-mult-wrap');
+  const customMultIn = $('custom-mult') as HTMLInputElement;
+  const dsrSection = $('dsr-section');
+  const dsrToggleBtn = $('dsr-toggle-btn');
+  const dsrPanel = $('dsr-panel');
+  const dsrSwitch = $('dsr-switch');
+  const dsrInputs = $('dsr-inputs');
+  const dsrFormula = $('dsr-formula');
+  const dsrCard = $('dsr-card');
+  const dsrWorkDays = $('dsr-work-days') as HTMLInputElement;
+  const dsrSundays = $('dsr-sundays') as HTMLInputElement;
+
+  // ── DSR Section Toggle ──
+  dsrToggleBtn.addEventListener('click', () => {
+    const isOpen = dsrSection.classList.toggle('dsr-open');
+    dsrPanel.classList.toggle('hidden', !isOpen);
+  });
+
+  // ── DSR Switch ──
+  dsrSwitch.addEventListener('click', () => {
+    dsrEnabled = !dsrEnabled;
+    dsrSwitch.setAttribute('aria-checked', String(dsrEnabled));
+    dsrInputs.classList.toggle('hidden', !dsrEnabled);
+    dsrFormula.classList.toggle('hidden', !dsrEnabled);
+    dsrCard.style.display = dsrEnabled ? '' : 'none';
+    update();
+  });
+
+  dsrWorkDays.addEventListener('input', update);
+  dsrSundays.addEventListener('input', update);
+
+  // ── Multiplier buttons ──
+  document.querySelectorAll('.mult-btn').forEach(btn => {
+    (btn as HTMLButtonElement).addEventListener('click', () => {
+      document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('mult-active'));
+      btn.classList.add('mult-active');
+      const val = (btn as HTMLElement).dataset.mult!;
+      if (val === 'custom') {
+        customMultWrap.classList.remove('hidden');
+        multiplier = parseFloat(customMultIn.value) || 1.75;
+      } else {
+        customMultWrap.classList.add('hidden');
+        multiplier = parseFloat(val);
+      }
+      update();
+    });
+  });
+
+  customMultIn.addEventListener('input', () => {
+    multiplier = Math.max(1, Math.min(4, parseFloat(customMultIn.value) || 1.5));
+    update();
+  });
+
+  function getMultLabel(): string {
+    return multiplier.toFixed(multiplier % 1 === 0 ? 0 : 1).replace('.', ',');
+  }
+
+  // ── Main update ──
+  function update() {
+    const rate = parseFloat(rateIn.value) || 20;
+    const days: D[] = dayNames.map((n, i) => ({ day: n, hours: hours[i] }));
+    const r = calcBrazil(days, rate, THRESHOLD, multiplier);
+    const p = period;
+    const periodLabels: Record<number, string> = { 1: 'Por Semana', 2: 'Por 2 Semanas', 4: 'Por Mês (4 sem.)', 52: 'Por Ano' };
+
+    // Sync inputs
+    dayInputs.forEach((el, i) => { el.value = String(hours[i]); });
+    $('total-hours').textContent = String(r.totalHours);
+    $('rule-badge').textContent = r.stateRule;
+    $('period-label').textContent = periodLabels[p] || `Por ${p} Semanas`;
+
+    // Mult labels
+    const ml = getMultLabel();
+    $('mult-label-card').textContent = ml;
+    $('mult-label-legend').textContent = ml;
+
+    // DSR calculation
+    let dsrValue = 0;
+    if (dsrEnabled) {
+      const workDays = parseInt(dsrWorkDays.value) || 22;
+      const sundays = parseInt(dsrSundays.value) || 8;
+      dsrValue = workDays > 0 ? (r.overtimePay / workDays) * sundays : 0;
+      $('dsr-pay').textContent = fmt(dsrValue * p);
+      $('dsr-ref-days').textContent = String(sundays);
+    }
+
+    // Pay cards (multiplied by period)
+    const grossTotal = (r.grossPay + dsrValue) * p;
+    $('gross-pay').textContent = fmt(grossTotal);
+    $('gross-hours').textContent = String(r.totalHours * p);
+    $('straight-pay').textContent = fmt(r.straightPay * p);
+    $('straight-hours').textContent = String(r.straightHours * p);
+    $('overtime-pay').textContent = fmt(r.overtimePay * p);
+    $('overtime-hours').textContent = String(r.overtimeHours * p);
+
+    drawChart(r);
+  }
+
+  // ── Chart ──
+  const tooltip = $('chart-tooltip');
+  interface BarSeg { x: number; yTop: number; yBot: number; type: string; pay: number; hours: number; day: string }
+  let barSegs: BarSeg[] = [];
+
+  function drawChart(r: R) {
+    const p = period;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    const ctx = canvas.getContext('2d')!;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    const db = r.dailyBreakdown;
+    const maxPay = Math.max(...db.map(d => d.totalPay * p), 1);
+    const pad = { top: 12, bottom: 22, left: 44, right: 6 };
+    const cW = rect.width - pad.left - pad.right;
+    const cH = rect.height - pad.top - pad.bottom;
+    const barW = Math.min(cW / 7 * 0.55, 38);
+    const gap = (cW - barW * 7) / 8;
+    const segGap = 3;
+    const rs = getComputedStyle(document.documentElement);
+    const hColor = rs.getPropertyValue('--color-g-hairline').trim() || '#ebebeb';
+    const mColor = rs.getPropertyValue('--color-g-mute').trim() || '#8f8f8f';
+    const colors = {
+      s: rs.getPropertyValue('--color-g-straight').trim() || '#9DD3FF',
+      o: rs.getPropertyValue('--color-g-overtime').trim() || '#96A6D6',
+    };
+    const radius = 6;
+
+    // Grid lines
+    ctx.strokeStyle = hColor; ctx.lineWidth = 1;
+    ctx.font = '10px ui-monospace, Menlo, monospace';
+    ctx.fillStyle = mColor; ctx.textAlign = 'right';
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.top + cH - (cH * i / 4);
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(rect.width - pad.right, y); ctx.stroke();
+      const val = maxPay * i / 4;
+      ctx.fillText(val >= 1000 ? `R$${(val/1000).toFixed(1)}k` : `R$${Math.round(val)}`, pad.left - 4, y + 3);
+    }
+
+    // Bars
+    barSegs = [];
+    ctx.textAlign = 'center';
+    db.forEach((d, i) => {
+      const x = pad.left + gap + i * (barW + gap);
+      const sP = d.straightPay * p, oP = d.overtimePay * p;
+      const sH = (sP / maxPay) * cH;
+      const oH = (oP / maxPay) * cH;
+      let y = pad.top + cH;
+
+      // Straight
+      if (sH > 0) {
+        const top = y - sH;
+        ctx.fillStyle = colors.s;
+        ctx.beginPath(); ctx.roundRect(x, top, barW, sH, radius); ctx.fill();
+        barSegs.push({ x, yTop: top, yBot: y, type: 'Normal (1×)', pay: sP, hours: d.straight * p, day: d.day });
+        y = top - segGap;
+      }
+      // Overtime
+      if (oH > 0) {
+        const top = y - oH;
+        ctx.fillStyle = colors.o;
+        ctx.beginPath(); ctx.roundRect(x, top, barW, oH, radius); ctx.fill();
+        barSegs.push({ x, yTop: top, yBot: y, type: `Hora Extra (${getMultLabel()}×)`, pay: oP, hours: d.overtime * p, day: d.day });
+      }
+
+      // Day label
+      ctx.fillStyle = mColor; ctx.font = '10px ui-monospace, Menlo, monospace';
+      ctx.fillText(d.day, x + barW / 2, pad.top + cH + 14);
+    });
+  }
+
+  // Hover tooltip
+  function handleChartPointer(clientX: number, clientY: number) {
+    const rect = canvas.getBoundingClientRect();
+    const mx = clientX - rect.left;
+    const my = clientY - rect.top;
+    let hit: BarSeg | null = null;
+    const barW = Math.min((rect.width - 50) / 7 * 0.55, 38);
+    for (const seg of barSegs) {
+      if (mx >= seg.x && mx <= seg.x + barW && my >= seg.yTop && my <= seg.yBot) {
+        hit = seg; break;
+      }
+    }
+    if (hit) {
+      tooltip.classList.remove('hidden');
+      tooltip.innerHTML = `<strong>${hit.day}</strong> · ${hit.type}<br>${fmt(hit.pay)} · ${hit.hours}h`;
+      tooltip.style.left = `${hit.x + barW / 2}px`;
+      tooltip.style.top = `${Math.max(10, hit.yTop - 12)}px`;
+    } else {
+      tooltip.classList.add('hidden');
+    }
+  }
+
+  canvas.addEventListener('mousemove', (e) => { handleChartPointer(e.clientX, e.clientY); });
+  canvas.addEventListener('mouseleave', () => { tooltip.classList.add('hidden'); });
+  canvas.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length > 0) {
+      handleChartPointer(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: true });
+
+  // ── Events ──
+  // +/- buttons
+  document.querySelectorAll('.hour-btn').forEach(btn => {
+    (btn as HTMLButtonElement).addEventListener('click', () => {
+      const d = parseInt((btn as HTMLElement).dataset.day!);
+      if ((btn as HTMLElement).dataset.action === 'increase' && hours[d] < 24) hours[d]++;
+      if ((btn as HTMLElement).dataset.action === 'decrease' && hours[d] > 0) hours[d]--;
+      highlightPreset(); update();
+    });
+  });
+
+  // Direct input typing
+  dayInputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      let v = parseInt(inp.value);
+      if (isNaN(v)) v = 0;
+      hours[i] = Math.max(0, Math.min(24, v));
+      highlightPreset(); update();
+    });
+    inp.addEventListener('blur', () => { inp.value = String(hours[i]); });
+  });
+
+  // Presets
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    (btn as HTMLButtonElement).addEventListener('click', () => {
+      const p = (btn as HTMLElement).dataset.preset!;
+      if (presets[p]) { hours = [...presets[p]];
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('preset-active'));
+        btn.classList.add('preset-active'); update();
+      }
+    });
+  });
+
+  function highlightPreset() {
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      const p = (btn as HTMLElement).dataset.preset!;
+      if (presets[p] && JSON.stringify(hours) === JSON.stringify(presets[p])) btn.classList.add('preset-active');
+      else btn.classList.remove('preset-active');
+    });
+  }
+
+  // Period multiplier
+  document.querySelectorAll('.period-btn').forEach(btn => {
+    (btn as HTMLButtonElement).addEventListener('click', () => {
+      period = parseInt((btn as HTMLElement).dataset.period!);
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('period-active'));
+      btn.classList.add('period-active'); update();
+    });
+  });
+
+  // Rate & Slider
+  function syncSlider() {
+    const val = parseFloat(slider.value) || 20;
+    const min = parseFloat(slider.min) || 7;
+    const max = parseFloat(slider.max) || 200;
+    const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+    slider.style.background = `linear-gradient(to right, var(--color-g-link) ${pct}%, color-mix(in srgb, var(--color-g-ink) 20%, var(--color-g-hairline)) ${pct}%)`;
+  }
+
+  rateIn.addEventListener('input', () => {
+    slider.value = rateIn.value;
+    syncSlider();
+    update();
+  });
+  slider.addEventListener('input', () => {
+    rateIn.value = parseFloat(slider.value).toFixed(2);
+    syncSlider();
+    update();
+  });
+
+  // PDF Export — structured calculation report in a new window
+  $('export-pdf-btn').addEventListener('click', () => {
+    const rate = parseFloat(rateIn.value) || 20;
+    const days: D[] = dayNames.map((n, i) => ({ day: n, hours: hours[i] }));
+    const r = calcBrazil(days, rate, THRESHOLD, multiplier);
+    const p = period;
+    const periodLabels: Record<number, string> = { 1: '1 Semana', 2: '2 Semanas', 4: 'Mensal (4 sem.)', 52: 'Anual' };
+    const periodLabel = periodLabels[p] || `${p} Semanas`;
+
+    let dsrValue = 0;
+    let dsrHtml = '';
+    if (dsrEnabled) {
+      const workDays = parseInt(dsrWorkDays.value) || 22;
+      const sundays = parseInt(dsrSundays.value) || 8;
+      dsrValue = workDays > 0 ? (r.overtimePay / workDays) * sundays : 0;
+      dsrHtml = `
+        <div style="margin-top:20px;padding:16px;border:1px solid #d1d5db;border-radius:8px;background:#f0fdf4;">
+          <h3 style="margin:0 0 10px;font-size:14px;font-weight:600;color:#166534;">DSR sobre Horas Extras</h3>
+          <table style="width:100%;font-size:13px;border-collapse:collapse;">
+            <tr><td style="padding:4px 0;color:#555;">Dias úteis no mês</td><td style="text-align:right;font-weight:600;">${workDays}</td></tr>
+            <tr><td style="padding:4px 0;color:#555;">Domingos e feriados</td><td style="text-align:right;font-weight:600;">${sundays}</td></tr>
+            <tr><td style="padding:4px 0;color:#555;">Fórmula</td><td style="text-align:right;font-family:monospace;font-size:11px;">(${fmt(r.overtimePay)} ÷ ${workDays}) × ${sundays}</td></tr>
+            <tr style="border-top:1px solid #d1d5db;"><td style="padding:8px 0 4px;font-weight:600;color:#166534;">Valor DSR (semanal)</td><td style="text-align:right;font-weight:700;font-size:15px;color:#166534;">${fmt(dsrValue)}</td></tr>
+            ${p > 1 ? `<tr><td style="padding:4px 0;color:#555;">Valor DSR (${periodLabel})</td><td style="text-align:right;font-weight:600;">${fmt(dsrValue * p)}</td></tr>` : ''}
+          </table>
+        </div>`;
+    }
+
+    const grossTotal = (r.grossPay + dsrValue) * p;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    // Build daily breakdown rows
+    const dayRows = r.dailyBreakdown.map(d => `
+      <tr>
+        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;font-weight:500;">${d.day}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.hours}h</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.straight}h</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.overtime}h</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(d.straightPay)}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(d.overtimePay)}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:600;">${fmt(d.totalPay)}</td>
+      </tr>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório de Horas Extras — CalculadoraHEOnline</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a1a; padding: 32px; max-width: 800px; margin: 0 auto; font-size: 13px; }
+    @media print { body { padding: 20px; } .no-print { display: none !important; } }
+    h1 { font-size: 20px; font-weight: 700; }
+    h2 { font-size: 15px; font-weight: 600; margin: 20px 0 10px; color: #333; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; border-bottom: 2px solid #1a1a1a; margin-bottom: 20px; }
+    .header-right { text-align: right; font-size: 11px; color: #888; }
+    .input-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .input-box { padding: 12px; background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .input-box .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; font-weight: 500; margin-bottom: 4px; }
+    .input-box .value { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th { padding: 8px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; font-weight: 500; border-bottom: 2px solid #d1d5db; }
+    thead th:not(:first-child) { text-align: center; }
+    thead th:nth-child(n+5) { text-align: right; }
+    .totals-row td { font-weight: 700; border-top: 2px solid #1a1a1a; padding-top: 8px; }
+    .summary-cards { display: grid; grid-template-columns: repeat(${dsrEnabled ? 4 : 3}, 1fr); gap: 12px; margin-top: 20px; }
+    .summary-card { padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; }
+    .summary-card.gross { border: 2px solid #0d9488; background: #f0fdfa; }
+    .summary-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; font-weight: 500; margin-bottom: 4px; }
+    .summary-card .amount { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .summary-card .sub { font-size: 11px; color: #888; margin-top: 2px; }
+    .summary-card.gross .label { color: #0d9488; }
+    .footer { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 10px; color: #aaa; text-align: center; }
+    .print-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 24px; background: #1a1a1a; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 24px; }
+    .print-btn:hover { background: #333; }
+  </style>
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Imprimir / Salvar PDF
+  </button>
+
+  <div class="header">
+    <div>
+      <h1>Relatório de Horas Extras</h1>
+      <p style="color:#888;font-size:12px;margin-top:4px;">Gerado por CalculadoraDeHorasExtrasOnline.com</p>
+    </div>
+    <div class="header-right">
+      <p>${dateStr}</p>
+      <p>Período: ${periodLabel}</p>
+    </div>
+  </div>
+
+  <h2>Dados de Entrada</h2>
+  <div class="input-summary">
+    <div class="input-box">
+      <div class="label">Salário/Hora Base</div>
+      <div class="value">${fmt(rate)}</div>
+    </div>
+    <div class="input-box">
+      <div class="label">Multiplicador</div>
+      <div class="value">${getMultLabel()}×</div>
+    </div>
+    <div class="input-box">
+      <div class="label">Regra Aplicada</div>
+      <div class="value" style="font-size:11px;line-height:1.4;">${r.stateRule}</div>
+    </div>
+  </div>
+
+  <h2>Detalhamento Diário</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Dia</th>
+        <th>Total</th>
+        <th>Normal</th>
+        <th>Extra</th>
+        <th style="text-align:right">Pag. Normal</th>
+        <th style="text-align:right">Pag. Extra</th>
+        <th style="text-align:right">Total Dia</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${dayRows}
+      <tr class="totals-row">
+        <td style="padding:8px;">TOTAL</td>
+        <td style="text-align:center;padding:8px;">${r.totalHours}h</td>
+        <td style="text-align:center;padding:8px;">${r.straightHours}h</td>
+        <td style="text-align:center;padding:8px;">${r.overtimeHours}h</td>
+        <td style="text-align:right;padding:8px;">${fmt(r.straightPay)}</td>
+        <td style="text-align:right;padding:8px;">${fmt(r.overtimePay)}</td>
+        <td style="text-align:right;padding:8px;">${fmt(r.grossPay)}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  ${p > 1 ? `<p style="font-size:11px;color:#888;margin-top:8px;text-align:right;">Valores acima são por semana. Veja o resumo abaixo para o período selecionado (${periodLabel}).</p>` : ''}
+
+  <h2>Resumo do Pagamento${p > 1 ? ` — ${periodLabel}` : ''}</h2>
+  <div class="summary-cards">
+    <div class="summary-card gross">
+      <div class="label">Remuneração Bruta</div>
+      <div class="amount">${fmt(grossTotal)}</div>
+      <div class="sub">${r.totalHours * p}h total</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Normal (1×)</div>
+      <div class="amount">${fmt(r.straightPay * p)}</div>
+      <div class="sub">${r.straightHours * p}h</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Hora Extra (${getMultLabel()}×)</div>
+      <div class="amount">${fmt(r.overtimePay * p)}</div>
+      <div class="sub">${r.overtimeHours * p}h</div>
+    </div>
+    ${dsrEnabled ? `
+    <div class="summary-card" style="border-color:#166534;background:#f0fdf4;">
+      <div class="label" style="color:#166534;">DSR sobre HE</div>
+      <div class="amount" style="color:#166534;">${fmt(dsrValue * p)}</div>
+      <div class="sub">Ref. ${parseInt(dsrSundays.value) || 8} dias</div>
+    </div>` : ''}
+  </div>
+
+  ${dsrHtml}
+
+  <div class="footer">
+    <p>Estimativas para empregados não isentos típicos. Não constitui assessoria jurídica, fiscal ou de folha de pagamento.</p>
+    <p style="margin-top:4px;">calculadoradehorasextrasonline.com — ${now.getFullYear()}</p>
+  </div>
+</body>
+</html>`;
+
+    const w = window.open('', '_blank', 'width=850,height=700');
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+    }
+  });
+
+  // Resize
+  let rt: ReturnType<typeof setTimeout>;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(update, 100); });
+
+  // Init
+  syncSlider();
+  update();
+
+  const themeObserver = new MutationObserver(() => {
+    syncSlider();
+    update();
+  });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+</script>

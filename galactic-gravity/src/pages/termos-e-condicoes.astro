@@ -1,0 +1,97 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+const pageTitle = "Termos e Condições - Calculadora de Horas Extras Online";
+const pageDescription = "Leia os Termos e Condições da Calculadora de Horas Extras Online. Informações sobre uso, isenção de responsabilidade e limitações da ferramenta.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Navbar />
+  <main class="flex-1">
+    <div class="section-container pt-8 sm:pt-12 pb-6 text-center">
+      <p class="mono-eyebrow mb-2">TERMOS LEGAIS • ATUALIZADO 2026</p>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-semibold mb-4" style="color: var(--color-g-ink);">Termos e Condições</h1>
+      <p class="text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" style="color: var(--color-g-body);">
+        Por favor, revise estes termos cuidadosamente antes de utilizar os cálculos, materiais de referência e ferramentas fornecidos neste site.
+      </p>
+    </div>
+
+    <article class="section-container pb-16">
+      <div class="max-w-3xl mx-auto space-y-8">
+        <div class="p-6 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: var(--color-g-link);"></span>
+            <h2 class="text-base font-semibold" style="color: var(--color-g-ink);">Aviso Importante de Estimativa</h2>
+          </div>
+          <p class="text-sm leading-relaxed" style="color: var(--color-g-body);">
+            A Calculadora de Horas Extras Online é uma ferramenta matemática automatizada independente, fornecida exclusivamente para estimativas informativas e educacionais. <strong>Não fornece assessoria jurídica, fiscal, de folha de pagamento ou contábil.</strong> A remuneração de horas extras pode ser afetada por acordos de trabalho, convenções coletivas, categorias profissionais específicas ou regulamentos municipais. Consulte seu departamento de recursos humanos, um profissional de contabilidade ou um advogado trabalhista para determinações oficiais de salário.
+          </p>
+        </div>
+
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">1. Aceitação dos Termos</h2>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+            Ao acessar ou usar a Calculadora de Horas Extras Online (<span class="font-mono text-xs sm:text-sm">calculadoradehorasextrasonline.com</span>), você concorda em estar vinculado a estes Termos e Condições e a todas as leis e regulamentos aplicáveis.
+          </p>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">2. Descrição do Serviço</h2>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+            A Calculadora de Horas Extras Online fornece uma ferramenta gratuita baseada na web que permite aos usuários estimar o pagamento de horas normais, horas extras (tipicamente 1,5× o salário/hora regular para 50%, ou 2× para domingos e feriados) de acordo com a Consolidação das Leis do Trabalho (CLT) brasileira.
+          </p>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+            Todos os cálculos são executados em tempo real dentro do seu navegador. O site é gratuito e não requer cadastro ou assinatura.
+          </p>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">3. Metodologia e Precisão dos Cálculos</h2>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">Embora nos esforcemos para manter fórmulas que reflitam a legislação trabalhista vigente:</p>
+          <ul class="list-disc pl-5 space-y-2 text-sm sm:text-base" style="color: var(--color-g-body);">
+            <li><strong>Sem Garantia de Precisão:</strong> Não garantimos que os cálculos estejam livres de discrepâncias matemáticas ou legais.</li>
+            <li><strong>Estruturas Salariais Complexas:</strong> A calculadora assume uma única taxa horária base. Não calcula automaticamente adicionais de insalubridade, periculosidade ou comissões.</li>
+            <li><strong>Isenções:</strong> Certos cargos de confiança (CLT Art. 62) podem ser legalmente isentos de horas extras.</li>
+          </ul>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">4. Propriedade Intelectual</h2>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+            O design, layout, gráficos, elementos de interface, algoritmos de cálculo e conteúdo textual deste site são propriedade intelectual da Calculadora de Horas Extras Online e estão protegidos pelas leis de direitos autorais aplicáveis.
+          </p>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">5. Isenção de Garantias</h2>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+            Os materiais e ferramentas da Calculadora de Horas Extras Online são fornecidos "COMO ESTÃO" e "CONFORME DISPONÍVEIS". Não fazemos garantias, expressas ou implícitas.
+          </p>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">6. Limitação de Responsabilidade</h2>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+            Em nenhum caso a Calculadora de Horas Extras Online, seus fundadores, colaboradores ou provedores de serviços serão responsáveis por quaisquer danos diretos, indiretos, incidentais, especiais ou consequentes — incluindo, sem limitação, salários perdidos, disputas trabalhistas ou lucros cessantes — decorrentes do uso ou incapacidade de uso desta calculadora.
+          </p>
+        </section>
+
+        <section class="p-6 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+          <h2 class="text-lg font-semibold mb-2" style="color: var(--color-g-ink);">7. Contato</h2>
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-g-body);">
+            Para consultas legais, dúvidas sobre estes Termos ou para reportar um problema com a calculadora:
+          </p>
+          <div class="flex items-center gap-3">
+            <span class="text-xs mono-eyebrow">Email:</span>
+            <a href="mailto:contato@calculadoradehorasextrasonline.com" class="font-mono text-sm sm:text-base font-medium underline" style="color: var(--color-g-link);">
+              contato@calculadoradehorasextrasonline.com
+            </a>
+          </div>
+        </section>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Layout>

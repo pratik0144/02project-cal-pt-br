@@ -1,0 +1,153 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+const pageTitle = "Sobre Nós - Calculadora de Horas Extras Online";
+const pageDescription = "Conheça a Calculadora de Horas Extras Online. Ferramenta gratuita, rápida e precisa para calcular horas extras com base na CLT brasileira.";
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+>
+  <Navbar />
+  <main class="flex-1">
+    <!-- Header -->
+    <div class="section-container pt-8 sm:pt-12 pb-6 text-center">
+      <p class="mono-eyebrow mb-2">NOSSO PROPÓSITO • FEITO PARA TRABALHADORES</p>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-semibold mb-4" style="color: var(--color-g-ink);">Sobre a Calculadora de Horas Extras Online</h1>
+      <p class="text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" style="color: var(--color-g-body);">
+        Nossa missão é fornecer uma ferramenta transparente, rápida e precisa para que os trabalhadores brasileiros possam verificar seus direitos trabalhistas com facilidade.
+      </p>
+    </div>
+
+    <!-- Main Content -->
+    <article class="section-container pb-16">
+      <div class="max-w-3xl mx-auto space-y-10">
+
+        <!-- Story Card -->
+        <div class="p-6 sm:p-8 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+          <h2 class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">O Problema com Calculadoras Genéricas de Horas Extras</h2>
+          <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
+            A maioria das calculadoras de horas extras disponíveis na internet trata o cálculo como uma equação trivial: <span class="font-mono text-xs sm:text-sm">Horas × 1,5</span>. Embora esse seja o padrão básico, ele ignora aspectos fundamentais da legislação trabalhista brasileira, como o DSR sobre horas extras, diferentes multiplicadores para domingos e feriados, e as particularidades da CLT.
+          </p>
+          <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+            Por exemplo, a hora extra em domingos e feriados deve ser paga com adicional de 100% (o dobro), enquanto em dias úteis o adicional mínimo é de 50%. Além disso, o reflexo das horas extras no Descanso Semanal Remunerado (DSR) frequentemente é ignorado. Usar uma calculadora genérica pode deixar centenas de reais sem contabilizar.
+          </p>
+        </div>
+
+        <!-- Four Pillars Section -->
+        <section>
+          <h2 class="text-xl sm:text-2xl font-semibold mb-6" style="color: var(--color-g-ink);">Nossos Princípios</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div class="p-5 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background-color: var(--color-g-hairline);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-g-link);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <h3 class="text-base font-semibold mb-1" style="color: var(--color-g-ink);">100% Privacidade no Navegador</h3>
+              <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
+                Seus dados salariais são confidenciais. Todos os cálculos acontecem diretamente no seu navegador. Nunca armazenamos, transmitimos ou monetizamos suas informações financeiras.
+              </p>
+            </div>
+
+            <div class="p-5 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background-color: var(--color-g-hairline);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-g-link);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              </div>
+              <h3 class="text-base font-semibold mb-1" style="color: var(--color-g-ink);">Baseada na CLT Brasileira</h3>
+              <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
+                Cálculos baseados na Consolidação das Leis do Trabalho (CLT), incluindo Art. 59 sobre horas extras, adicional de 50% e 100%, e cálculo de DSR sobre horas extras.
+              </p>
+            </div>
+
+            <div class="p-5 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background-color: var(--color-g-hairline);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-g-link);"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+              <h3 class="text-base font-semibold mb-1" style="color: var(--color-g-ink);">Detalhamento Visual</h3>
+              <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
+                Veja exatamente de onde vem cada real com gráficos coloridos: pagamento normal, hora extra com adicional de 50% (1,5×) e 100% (2×).
+              </p>
+            </div>
+
+            <div class="p-5 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-3" style="background-color: var(--color-g-hairline);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-g-link);"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <h3 class="text-base font-semibold mb-1" style="color: var(--color-g-ink);">Sem Paywalls ou Popups</h3>
+              <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
+                Sem cadastros obrigatórios, assinaturas ou popups intrusivos. Abra a calculadora, insira suas horas e veja os resultados instantaneamente.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Who We Serve -->
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">Quem Usa Nossa Calculadora?</h2>
+          <ul class="space-y-3">
+            <li class="p-4 rounded-lg flex items-start gap-3" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+              <span class="mt-1 w-2 h-2 rounded-full shrink-0" style="background-color: var(--color-g-link);"></span>
+              <div>
+                <strong class="text-sm block" style="color: var(--color-g-ink);">Trabalhadores CLT e Horistas</strong>
+                <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
+                  Verifique seus holerites e confirme se suas horas extras estão sendo pagas corretamente após jornadas longas ou trabalho em fins de semana.
+                </p>
+              </div>
+            </li>
+            <li class="p-4 rounded-lg flex items-start gap-3" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+              <span class="mt-1 w-2 h-2 rounded-full shrink-0" style="background-color: var(--color-g-link);"></span>
+              <div>
+                <strong class="text-sm block" style="color: var(--color-g-ink);">Pequenos Empresários e Gestores</strong>
+                <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
+                  Estime rapidamente os custos trabalhistas ao planejar escalas com horas extras, sem precisar de softwares complexos de folha de pagamento.
+                </p>
+              </div>
+            </li>
+            <li class="p-4 rounded-lg flex items-start gap-3" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+              <span class="mt-1 w-2 h-2 rounded-full shrink-0" style="background-color: var(--color-g-link);"></span>
+              <div>
+                <strong class="text-sm block" style="color: var(--color-g-ink);">Profissionais de RH e Departamento Pessoal</strong>
+                <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
+                  Realize verificações rápidas para conferir cálculos de horas extras e DSR, garantindo conformidade com a legislação trabalhista.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <!-- CTA Box -->
+        <div class="p-6 sm:p-8 rounded-xl text-center space-y-4" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+          <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">Pronto para Calcular Suas Horas Extras?</h2>
+          <p class="text-xs sm:text-sm max-w-lg mx-auto" style="color: var(--color-g-body);">
+            Insira seu salário/hora e veja o detalhamento completo do pagamento em segundos.
+          </p>
+          <div class="pt-2">
+            <a href="/" class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm" style="background-color: var(--color-g-ink); color: var(--color-g-on-primary);">
+              Abrir Calculadora de Horas Extras →
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact Section -->
+        <section class="p-6 rounded-xl" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+          <h2 class="text-lg font-semibold mb-2" style="color: var(--color-g-ink);">Feedback e Dúvidas</h2>
+          <p class="text-sm leading-relaxed mb-4" style="color: var(--color-g-body);">
+            Estamos comprometidos em manter a calculadora de horas extras mais precisa da web. Se você notou alguma atualização legislativa ou tem uma sugestão para melhorar a ferramenta, entre em contato:
+          </p>
+          <div class="flex items-center gap-3">
+            <span class="text-xs mono-eyebrow">Email:</span>
+            <a href="mailto:contato@calculadoradehorasextrasonline.com" class="font-mono text-sm sm:text-base font-medium underline" style="color: var(--color-g-link);">
+              contato@calculadoradehorasextrasonline.com
+            </a>
+          </div>
+        </section>
+
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Layout>

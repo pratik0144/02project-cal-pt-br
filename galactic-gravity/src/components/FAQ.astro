@@ -1,0 +1,207 @@
+---
+/**
+ * FAQ.astro: SEO-friendly FAQ section with JSON-LD structured data
+ * Renders an interactive accordion and injects FAQPage schema markup
+ */
+
+const faqs = [
+  {
+    question: "Como calcular horas extras?",
+    answer: "O valor da hora extra é calculado multiplicando o valor da sua hora normal de trabalho pelo adicional devido (geralmente 1.5 para o adicional de 50% ou 2 para 100%). Por exemplo, se você tem um salário mensal de R$ 2.500 trabalhando 44 horas semanais, você divide esse valor por 220 para achar sua hora normal (R$ 11,36/hora). Ao aplicar o adicional de 50%, a sua hora extra valerá R$ 17,05. Nossa calculadora faz tudo isso automaticamente para você."
+  },
+  {
+    question: "How to calculate DSR on overtime pay?",
+    answer: "DSR (Weekly Rest Pay) on overtime is calculated by dividing total overtime pay by working days in the month, then multiplying by the number of Sundays and holidays. Formula: DSR = (Total OT Pay ÷ Working Days) × Sundays/Holidays. For example, if you earned R$ 500 in overtime, and the month has 25 working days and 5 Sundays/holidays: (500 ÷ 25) × 5 = R$ 100 of DSR."
+  },
+  {
+    question: "Como calcular o DSR sobre horas extras?",
+    answer: "Para calcular o DSR (Descanso Semanal Remunerado) sobre as horas extras, a fórmula é: DSR = (Valor total das horas extras ÷ Dias úteis do mês) × Domingos e feriados. Por exemplo: Se você fez R$ 300 de horas extras num mês com 26 dias úteis e 4 domingos, o cálculo será (300 ÷ 26) × 4 = R$ 46,15 de DSR sobre as horas extras."
+  },
+  {
+    question: "Como calcular horas extras 100%?",
+    answer: "A hora extra com adicional de 100% é aplicada aos domingos e feriados trabalhados, ou conforme determinado por acordo coletivo. A fórmula é simples: Valor da HE = valor da hora normal × 2. Por exemplo, se a sua hora de trabalho normal custa R$ 15,00, a sua hora extra a 100% valerá R$ 30,00."
+  },
+  {
+    question: "Como calcular horas extras 50%?",
+    answer: "A hora extra a 50% é o padrão para o trabalho extraordinário realizado em dias úteis (segunda a sábado, se o sábado for dia útil de trabalho). A fórmula é: Valor da HE = valor da hora normal × 1,5. Por exemplo, se você ganha R$ 15,00 por hora normal, a sua hora extra com 50% de adicional será R$ 22,50."
+  },
+  {
+    question: "Como calcular as horas extras trabalhadas?",
+    answer: "O passo a passo é: 1) Converta o seu salário em valor/hora (se a jornada é 44h semanais, divida o salário por 220). 2) Identifique quantas horas extras você fez no mês. 3) Aplique o multiplicador (1,5 para 50% ou 2 para 100%) sobre o valor da hora. 4) Calcule o DSR sobre o montante total. A nossa calculadora realiza todas essas etapas automaticamente e sem complicação."
+  },
+  {
+    question: "Qual o limite de horas extras permitido pela CLT?",
+    answer: "O Artigo 59 da CLT permite a realização de, no máximo, 2 horas extras por dia. O limite mensal varia de acordo com os dias úteis, mas na prática, não deve ultrapassar 44 horas extras (2h × 22 dias úteis, em média). Há exceções apenas para casos de força maior ou se a empresa trabalhar com o sistema de banco de horas (acordo de compensação)."
+  },
+  {
+    question: "O que é banco de horas e como funciona?",
+    answer: "O banco de horas é um sistema de compensação. Em vez de pagar financeiramente as horas extras, a empresa concede o período correspondente como folga ao trabalhador ou reduz a sua jornada em outros dias. Se for por acordo individual, deve ser compensado em até 6 meses; por acordo coletivo, em até 1 ano. Caso as horas não sejam compensadas no prazo estipulado, deverão ser pagas com o adicional devido."
+  },
+  {
+    question: "Funcionários com salário fixo têm direito a hora extra?",
+    answer: "Sim! Com exceção dos trabalhadores em cargos de gestão, gerência ou de confiança (previstos no Artigo 62 da CLT) ou quem exerce teletrabalho por produção. A imensa maioria dos trabalhadores assalariados, que possuem controle de jornada (ponto), têm direito a receber horas extras caso passem do seu horário contratual."
+  },
+  {
+    question: "Como calcular hora extra noturna?",
+    answer: "A hora extra noturna possui um acréscimo extra. O trabalho noturno (das 22h às 5h para o trabalhador urbano) tem um adicional de 20%. Além disso, a hora noturna é reduzida, durando 52 minutos e 30 segundos. O cálculo da hora extra noturna seria: valor da hora normal × 1,2 (adicional noturno) × 1,5 (adicional de hora extra a 50%, ou 2,0 se for a 100%)."
+  },
+  {
+    question: "Hora extra é descontada no imposto de renda?",
+    answer: "Sim. O valor recebido de horas extras integra o seu salário bruto, portanto incide tanto a contribuição previdenciária (INSS) quanto o Imposto de Renda Retido na Fonte (IRRF). Dependendo da quantia em horas extras, isso poderá elevar o seu salário naquele mês para uma faixa de tributação superior."
+  },
+  {
+    question: "Vale a pena fazer hora extra?",
+    answer: "Do ponto de vista financeiro, geralmente sim, pois você recebe no mínimo 50% a mais pelo seu tempo trabalhado. Contudo, você deve considerar o impacto que as horas excedentes terão no seu imposto de renda (pois aumentam a base de cálculo), e principalmente, pesar os efeitos na sua saúde, descanso e tempo livre com a família."
+  }
+];
+
+// Build JSON-LD for FAQPage
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+---
+
+<!-- FAQ JSON-LD -->
+<script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+<section class="py-12 sm:py-16" id="faq">
+  <div class="section-container">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-8">
+        <p class="mono-eyebrow mb-2">PERGUNTAS FREQUENTES</p>
+        <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">
+          FAQ - Calculadora de Horas Extras
+        </h2>
+        <p class="mt-2 text-sm sm:text-base" style="color: var(--color-g-body);">
+          Respostas para as dúvidas mais comuns sobre horas extras, DSR, e como usar nossa calculadora.
+        </p>
+      </div>
+
+      <div class="faq-list" id="faq-list">
+        {faqs.map((faq, i) => (
+          <details class="faq-item" name="faq">
+            <summary class="faq-question">
+              <span class="faq-q-text">{faq.question}</span>
+              <svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-g-hairline);
+    border-radius: var(--radius-md);
+    background: var(--color-g-elevated);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .faq-item:hover {
+    border-color: var(--color-g-mute);
+  }
+
+  .faq-item[open] {
+    border-color: color-mix(in srgb, var(--color-g-link) 40%, var(--color-g-hairline));
+  }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s;
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-question::marker {
+    content: '';
+  }
+
+  .faq-question:hover {
+    background: color-mix(in srgb, var(--color-g-link) 4%, transparent);
+  }
+
+  .faq-q-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-g-ink);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 640px) {
+    .faq-q-text {
+      font-size: 15px;
+    }
+  }
+
+  .faq-chevron {
+    flex-shrink: 0;
+    color: var(--color-g-mute);
+    transition: transform 0.2s ease;
+  }
+
+  .faq-item[open] .faq-chevron {
+    transform: rotate(180deg);
+    color: var(--color-g-link);
+  }
+
+  .faq-answer {
+    padding: 0 20px 16px;
+    animation: faq-fade-in 0.2s ease;
+  }
+
+  .faq-answer p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--color-g-body);
+  }
+
+  @media (min-width: 640px) {
+    .faq-answer p {
+      font-size: 14px;
+    }
+    .faq-question {
+      padding: 18px 24px;
+    }
+    .faq-answer {
+      padding: 0 24px 20px;
+    }
+  }
+
+  @keyframes faq-fade-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

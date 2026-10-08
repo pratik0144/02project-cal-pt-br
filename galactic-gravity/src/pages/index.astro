@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Calculator from '../components/Calculator.astro';
+import Footer from '../components/Footer.astro';
+import FAQ from '../components/FAQ.astro';
+import SeoContent from '../components/SeoContent.astro';
+
+const pageTitle = "Calculadora de Horas Extras Online Grátis - Calcular Hora Extra CLT (2026)";
+const pageDescription = "Calculadora de horas extras online grátis. Calcule horas extras trabalhadas com adicional de 50% e 100%, DSR sobre horas extras e salário total. Baseada na CLT. Atualizada para 2026.";
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+>
+  <Navbar />
+  <main class="flex-1">
+    <!-- Hero heading -->
+    <div class="section-container pt-6 sm:pt-8 text-center">
+      <p class="mono-eyebrow mb-2">LEGISLAÇÃO BRASILEIRA CLT • ATUALIZADO 2026</p>
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl">Calculadora de Horas Extras</h1>
+      <p class="mt-2 text-sm sm:text-base max-w-2xl mx-auto" style="color: var(--color-g-body);">
+        Calcule suas horas extras automaticamente com base na CLT. Insira seu salário/hora e veja o detalhamento completo do pagamento.
+      </p>
+    </div>
+
+    <!-- Calculator Component -->
+    <Calculator hideTitle={true} />
+
+    <div class="section-container">
+      <hr class="my-8 sm:my-12" style="border-color: var(--color-g-hairline);" />
+    </div>
+
+    <!-- SEO Content -->
+    <SeoContent />
+
+    <div class="section-container">
+      <hr class="my-8 sm:my-12" style="border-color: var(--color-g-hairline);" />
+    </div>
+
+    <!-- FAQ Section -->
+    <FAQ />
+  </main>
+  <Footer />
+</Layout>

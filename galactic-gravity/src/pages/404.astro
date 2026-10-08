@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+const pageTitle = "404 - Página Não Encontrada | Calculadora de Horas Extras Online";
+const pageDescription = "A página que você procura não existe na Calculadora de Horas Extras Online. Volte para a calculadora.";
+---
+
+<Layout title={pageTitle} description={pageDescription} noindex={true}>
+  <Navbar />
+  <main class="flex-1 flex flex-col justify-center items-center py-12 sm:py-20">
+    <div class="section-container text-center max-w-2xl mx-auto space-y-8">
+
+      <!-- Status Badge -->
+      <div>
+        <span class="mono-eyebrow inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs" style="background-color: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
+          <span class="w-1.5 h-1.5 rounded-full" style="background-color: #ef4444;"></span>
+          ERRO 404 • PÁGINA NÃO ENCONTRADA
+        </span>
+      </div>
+
+      <!-- Large 404 Display -->
+      <div class="space-y-3">
+        <h1 class="text-7xl sm:text-9xl font-mono font-bold tracking-tight" style="color: var(--color-g-ink); letter-spacing: -0.05em;">
+          404
+        </h1>
+        <h2 class="text-2xl sm:text-3xl font-semibold" style="color: var(--color-g-ink);">
+          Esta página saiu de expediente.
+        </h2>
+        <p class="text-sm sm:text-base leading-relaxed max-w-md mx-auto" style="color: var(--color-g-body);">
+          A URL ou página que você está procurando não existe, foi movida ou possui um link expirado.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <a
+          href="/"
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-all shadow-sm"
+          style="background-color: var(--color-g-ink); color: var(--color-g-on-primary);"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span>Voltar à Calculadora</span>
+        </a>
+        <a
+          href="/fale-conosco/"
+          class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-sm font-medium transition-colors"
+          style="border: 1px solid var(--color-g-hairline); background-color: var(--color-g-elevated); color: var(--color-g-ink);"
+        >
+          <span>Fale Conosco</span>
+        </a>
+      </div>
+
+      <!-- Need Help Note -->
+      <p class="text-xs" style="color: var(--color-g-mute);">
+        Acha que isso é um link quebrado no nosso site? Avise-nos em{' '}
+        <a href="mailto:contato@calculadoradehorasextrasonline.com" class="font-mono underline" style="color: var(--color-g-link);">
+          contato@calculadoradehorasextrasonline.com
+        </a>
+      </p>
+
+    </div>
+  </main>
+  <Footer />
+</Layout>

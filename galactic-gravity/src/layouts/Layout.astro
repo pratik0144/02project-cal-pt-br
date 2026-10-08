@@ -1,0 +1,115 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  ogType?: string;
+  keywords?: string;
+  article?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  title = "Calculadora de Horas Extras Online Grátis - Calcular Hora Extra CLT (2026)",
+  description = "Calculadora de horas extras online grátis. Calcule horas extras trabalhadas, adicional de 50% e 100%, DSR sobre horas extras e salário com hora extra. Atualizada para 2026.",
+  ogImage = "https://calculadoradehorasextrasonline.com/og-image.png",
+  ogType = "website",
+  article = false,
+  noindex = false
+} = Astro.props;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Calculadora de Horas Extras Online",
+      "description": description,
+      "url": "https://calculadoradehorasextrasonline.com",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BRL"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "url": "https://calculadoradehorasextrasonline.com",
+      "name": "Calculadora de Horas Extras Online"
+    }
+  ]
+};
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="keywords" content="calculadora de horas extras, calcular horas extras, calcular hora extra, calculo de hora extra, calculadora de horas extras com minutos, calculadora de horas extras e dsr, como calcular horas extras trabalhadas, calculate overtime online" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"} />
+    <meta name="author" content="CalculadoraDeHorasExtrasOnline.com" />
+    
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="HorasExtras" />
+    <link rel="manifest" href="/site.webmanifest" />
+    
+    <link rel="alternate" hreflang="pt" href="https://calculadoradehorasextrasonline.com" />
+    <link rel="alternate" hreflang="pt-BR" href="https://calculadoradehorasextrasonline.com" />
+    <link rel="alternate" hreflang="x-default" href="https://calculadoradehorasextrasonline.com" />
+    
+    <link rel="canonical" href={Astro.url.href} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:site_name" content="CalculadoraDeHorasExtrasOnline.com" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Calculadora de Horas Extras Online" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="Calculadora de Horas Extras Online" />
+
+    <!-- Fonts: swap for perf -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Dark mode: apply before paint to prevent flash -->
+    <script is:inline>
+      (function() {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col antialiased">
+    <slot />
+  </body>
+</html>
