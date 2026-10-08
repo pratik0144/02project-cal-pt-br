@@ -1,9 +1,9 @@
 ---
 /**
  * Calculator.astro: Calculadora de Horas Extras – Brasil (CLT)
- * Multiplicador configurável (padrão 1,5×).
- * Inclui DSR e exportação PDF.
- * Suporta múltiplas semanas de entrada.
+ * Multiplicador configurável (padrão 1.5×).
+ * Inclui DSR ao lado do multiplicador e exportação PDF.
+ * Suporta múltiplas semanas de entrada com navegação rápida e gesto de deslize (swipe).
  */
 interface Props {
   hideTitle?: boolean;
@@ -22,18 +22,59 @@ const { hideTitle = false } = Astro.props;
       </div>
     )}
 
-    <div class="card-lg max-w-5xl mx-auto">
-      <!-- Controls Row -->
+    <div class="card-lg max-w-5xl mx-auto p-3.5 sm:p-6 lg:p-8">
+      <!-- Controls Row: Overtime Multiplier + DSR side-by-side, and Rate -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-        <!-- Overtime Multiplier (simple input) -->
+        <!-- Col 1: Overtime Multiplier & DSR toggle -->
         <div>
-          <label for="overtime-mult" class="calc-label">Multiplicador de Hora Extra</label>
-          <div class="relative" style="max-width: 130px;">
-            <input type="number" id="overtime-mult" class="calc-input" value="1.5" min="1" max="4" step="0.05" style="padding-right: 28px; font-family: var(--font-mono);" />
-            <span class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 14px; font-weight: 600; pointer-events: none;">×</span>
+          <div class="flex items-start gap-4 sm:gap-6 flex-wrap">
+            <!-- Overtime Multiplier -->
+            <div>
+              <label for="overtime-mult" class="calc-label">Multiplicador HE</label>
+              <div class="relative" style="width: 110px;">
+                <input
+                  type="number"
+                  id="overtime-mult"
+                  class="calc-input"
+                  value="1.5"
+                  min="1"
+                  max="4"
+                  step="0.05"
+                  style="padding-right: 26px; font-family: var(--font-mono);"
+                />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 14px; font-weight: 600; pointer-events: none;">×</span>
+              </div>
+            </div>
+
+            <!-- DSR ON OVERTIME toggle -->
+            <div>
+              <label class="calc-label">DSR sobre HE</label>
+              <div class="flex items-center gap-2 h-[40px]">
+                <button id="dsr-switch" type="button" role="switch" aria-checked="false" class="dsr-switch" aria-label="Ativar DSR sobre horas extras">
+                  <span class="dsr-switch-thumb"></span>
+                </button>
+                <span id="dsr-status-badge" class="text-xs font-mono font-medium px-2 py-0.5 rounded" style="background: var(--color-g-canvas); color: var(--color-g-mute); border: 1px solid var(--color-g-hairline);">Não</span>
+              </div>
+            </div>
           </div>
+
+          <!-- DSR Inputs (revealed underneath when DSR is enabled) -->
+          <div id="dsr-inputs" class="hidden mt-3 grid grid-cols-2 gap-3" style="max-width: 300px;">
+            <div>
+              <label for="dsr-work-days" class="calc-label text-[11px]">Dias úteis/mês</label>
+              <input type="number" id="dsr-work-days" class="calc-input" value="22" min="1" max="31" />
+            </div>
+            <div>
+              <label for="dsr-sundays" class="calc-label text-[11px]">Dom./Feriados</label>
+              <input type="number" id="dsr-sundays" class="calc-input" value="8" min="0" max="15" />
+            </div>
+          </div>
+          <p id="dsr-formula" class="hidden text-[10px] mt-1.5" style="color: var(--color-g-mute); font-family: var(--font-mono);">
+            DSR = (Total HE ÷ Dias Úteis) × Domingos/Feriados
+          </p>
         </div>
-        <!-- Rate -->
+
+        <!-- Col 2: Rate -->
         <div>
           <label for="hourly-rate" class="calc-label">Salário/Hora Base</label>
           <div class="flex items-center gap-3">
@@ -67,78 +108,72 @@ const { hideTitle = false } = Astro.props;
         </div>
       </div>
 
-      <!-- Week Indicator (visible when multi-week) -->
-      <div id="week-indicator" class="hidden text-center mb-2">
+      <!-- Week Indicator (above QUI/THU in centre) -->
+      <div id="week-indicator" class="hidden text-center mb-2.5">
         <span id="week-label" class="week-indicator-badge">SEMANA 1 DE 2</span>
       </div>
 
-      <!-- Weekly Hours Grid -->
-      <div class="mb-6">
-        <div class="grid grid-cols-7 gap-[6px] sm:gap-3" id="hours-grid">
-          {['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'].map((day, i) => (
-            <div class="flex flex-col items-center">
-              <span class="day-label">{day}</span>
-              <div class="day-cell">
-                <button class="hour-btn hour-btn-up" data-day={i} data-action="increase" aria-label={`Aumentar ${day}`}>
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M5 1.5v7M1.5 5h7"/></svg>
-                </button>
-                <input
-                  type="number"
-                  class="day-input"
-                  data-day={i}
-                  value={i < 5 ? '8' : '0'}
-                  min="0"
-                  max="24"
-                  step="1"
-                  inputmode="numeric"
-                  aria-label={`${day} horas`}
-                />
-                <button class="hour-btn hour-btn-down" data-day={i} data-action="decrease" aria-label={`Diminuir ${day}`}>
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M1.5 5h7"/></svg>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <!-- Week Navigation (below grid, visible when multi-week) -->
-        <div id="week-nav" class="hidden flex items-center justify-center gap-1.5 mt-3">
-          <button id="week-prev" class="week-nav-btn" aria-label="Semana anterior">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
-          </button>
-          <div id="week-pills" class="flex gap-1"></div>
-          <button id="week-next" class="week-nav-btn" aria-label="Próxima semana">
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
-          </button>
-        </div>
-
-        <p class="text-center text-xs mt-2" style="color: var(--color-g-mute);">
-          <span id="week-total-wrap" class="hidden">Semana: <span id="week-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span>h · </span>
-          Total: <span id="total-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span> <span id="total-suffix">hrs/semana</span>
-        </p>
-      </div>
-
-      <!-- DSR Section (inline toggle — no dropdown) -->
+      <!-- Weekly Hours Grid (with swipe support on mobile) -->
       <div class="mb-5">
-        <div class="flex items-center gap-3 flex-wrap">
-          <span class="mono-eyebrow">DSR SOBRE HORAS EXTRAS</span>
-          <button id="dsr-switch" type="button" role="switch" aria-checked="false" class="dsr-switch">
-            <span class="dsr-switch-thumb"></span>
-          </button>
-        </div>
-        <div id="dsr-inputs" class="hidden mt-3 grid grid-cols-2 gap-3" style="max-width: 340px;">
-          <div>
-            <label for="dsr-work-days" class="calc-label">Dias úteis no mês</label>
-            <input type="number" id="dsr-work-days" class="calc-input" value="22" min="1" max="31" />
+        <div id="hours-grid-wrapper" class="relative overflow-hidden touch-pan-y" style="border-radius: 14px;">
+          <div class="grid grid-cols-7 gap-1 sm:gap-3 transition-transform" id="hours-grid">
+            {['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'].map((day, i) => (
+              <div class="flex flex-col items-center">
+                <span class="day-label">{day}</span>
+                <div class="day-cell">
+                  <button class="hour-btn hour-btn-up" data-day={i} data-action="increase" aria-label={`Aumentar ${day}`}>
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M5 1.5v7M1.5 5h7"/></svg>
+                  </button>
+                  <input
+                    type="number"
+                    class="day-input"
+                    data-day={i}
+                    value={i < 5 ? '8' : '0'}
+                    min="0"
+                    max="24"
+                    step="1"
+                    inputmode="numeric"
+                    aria-label={`${day} horas`}
+                  />
+                  <button class="hour-btn hour-btn-down" data-day={i} data-action="decrease" aria-label={`Diminuir ${day}`}>
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M1.5 5h7"/></svg>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-          <div>
-            <label for="dsr-sundays" class="calc-label">Domingos e feriados</label>
-            <input type="number" id="dsr-sundays" class="calc-input" value="8" min="0" max="15" />
+        </div>
+
+        <!-- Week Navigation (below grid: week pills on left, small prev/next arrows under SUN on right) -->
+        <div id="week-nav" class="hidden flex items-center justify-between mt-2.5 px-0.5">
+          <div class="flex items-center gap-1.5">
+            <span class="mono-eyebrow text-[10px] hidden sm:inline">SEMANAS:</span>
+            <div id="week-pills" class="flex gap-1"></div>
+            <span class="text-[10px] font-mono sm:hidden" style="color: var(--color-g-mute);">(deslize ↔)</span>
+          </div>
+          <!-- Arrows under SUN box -->
+          <div class="flex items-center gap-1">
+            <button id="week-prev" class="week-nav-btn-sm" aria-label="Semana anterior" title="Semana anterior">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
+            </button>
+            <button id="week-next" class="week-nav-btn-sm" aria-label="Próxima semana" title="Próxima semana">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+            </button>
           </div>
         </div>
-        <p id="dsr-formula" class="hidden text-xs mt-2" style="color: var(--color-g-mute); font-family: var(--font-mono);">
-          DSR = (Total HE ÷ Dias Úteis) × Domingos/Feriados
-        </p>
+
+        <div class="flex items-center justify-center flex-wrap gap-2 text-xs mt-3 select-none" style="color: var(--color-g-mute);">
+          <div id="week-total-wrap" class="hidden items-center gap-1.5 px-3 py-1 rounded-full" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline);">
+            <span>Semana:</span>
+            <span id="week-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span>
+            <span>h</span>
+          </div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline);">
+            <span>Total:</span>
+            <span id="total-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span>
+            <span id="total-suffix">hrs/semana</span>
+          </div>
+        </div>
       </div>
 
       <!-- Period Multiplier -->
@@ -165,7 +200,7 @@ const { hideTitle = false } = Astro.props;
           <p class="pay-sub"><span id="straight-hours" class="font-mono">40</span>h</p>
         </div>
         <div class="pay-card pay-card-border">
-          <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-overtime);">HORA EXTRA (<span id="mult-label-card">1,5</span>×)</p>
+          <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-overtime);">HORA EXTRA (<span id="mult-label-card">1.5</span>×)</p>
           <p class="pay-amount" id="overtime-pay">R$&nbsp;0,00</p>
           <p class="pay-sub"><span id="overtime-hours" class="font-mono">0</span>h</p>
         </div>
@@ -193,7 +228,7 @@ const { hideTitle = false } = Astro.props;
           </div>
           <div class="flex items-center gap-1.5">
             <span class="w-2.5 h-2.5 rounded-full" style="background: var(--color-g-overtime);"></span>
-            <span class="legend-text">Hora Extra (<span id="mult-label-legend">1,5</span>×)</span>
+            <span class="legend-text">Hora Extra (<span id="mult-label-legend">1.5</span>×)</span>
           </div>
         </div>
       </div>
@@ -236,6 +271,7 @@ const { hideTitle = false } = Astro.props;
     border: 1px solid var(--color-g-hairline);
     border-radius: var(--radius-sm);
     transition: border-color 0.15s;
+    touch-action: manipulation;
   }
   .calc-select:focus,
   .calc-input:focus {
@@ -256,6 +292,7 @@ const { hideTitle = false } = Astro.props;
     cursor: pointer;
     margin: 0;
     transition: background 0.1s ease;
+    touch-action: manipulation;
   }
   .calc-slider:focus-visible {
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-g-link) 35%, transparent);
@@ -300,48 +337,51 @@ const { hideTitle = false } = Astro.props;
     border: none;
   }
 
-  /* ── Day cells ── */
+  /* ── Day cells (Mobile optimized) ── */
   .day-label {
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.06em;
-    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+    margin-bottom: 3px;
     color: var(--color-g-mute);
     font-family: var(--font-mono);
   }
   @media (min-width: 640px) {
-    .day-label { font-size: 11px; }
+    .day-label { font-size: 11px; margin-bottom: 4px; }
   }
   .day-cell {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     width: 100%;
-    padding: 6px 2px;
+    padding: 6px 1px;
     background: var(--color-g-canvas);
     border: 1px solid var(--color-g-hairline);
-    border-radius: 16px;
+    border-radius: 12px;
+    box-sizing: border-box;
   }
   @media (min-width: 640px) {
     .day-cell {
       padding: 10px 4px;
       gap: 6px;
+      border-radius: 16px;
     }
   }
   .day-input {
     width: 100%;
-    max-width: 48px;
+    max-width: 38px;
     text-align: center;
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 600;
     font-family: var(--font-mono);
     color: var(--color-g-ink);
     background: transparent;
     border: none;
     outline: none;
-    padding: 2px 0;
+    padding: 1px 0;
     -moz-appearance: textfield;
+    touch-action: manipulation;
   }
   .day-input::-webkit-outer-spin-button,
   .day-input::-webkit-inner-spin-button {
@@ -354,20 +394,20 @@ const { hideTitle = false } = Astro.props;
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-g-link) 25%, transparent);
   }
   @media (min-width: 640px) {
-    .day-input { font-size: 24px; max-width: 56px; }
+    .day-input { font-size: 24px; max-width: 56px; padding: 2px 0; }
   }
   .hour-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     color: var(--color-g-mute);
     background: var(--color-g-elevated);
     border: 1px solid var(--color-g-hairline);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.12s ease;
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
@@ -407,8 +447,9 @@ const { hideTitle = false } = Astro.props;
     background: var(--color-g-elevated);
     color: var(--color-g-ink);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.12s;
     white-space: nowrap;
+    touch-action: manipulation;
   }
   .preset-btn:hover { border-color: var(--color-g-mute); }
   .preset-active {
@@ -429,7 +470,8 @@ const { hideTitle = false } = Astro.props;
     background: var(--color-g-elevated);
     color: var(--color-g-body);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.12s;
+    touch-action: manipulation;
   }
   .period-btn:hover { border-color: var(--color-g-mute); }
   .period-active {
@@ -498,6 +540,7 @@ const { hideTitle = false } = Astro.props;
     transition: background 0.2s;
     padding: 0;
     flex-shrink: 0;
+    touch-action: manipulation;
   }
   .dsr-switch[aria-checked='true'] {
     background: var(--color-g-link);
@@ -520,7 +563,7 @@ const { hideTitle = false } = Astro.props;
   /* ── Week Navigation ── */
   .week-indicator-badge {
     display: inline-block;
-    padding: 2px 12px;
+    padding: 2px 14px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -528,33 +571,36 @@ const { hideTitle = false } = Astro.props;
     font-family: var(--font-mono);
     background: color-mix(in srgb, var(--color-g-link) 12%, transparent);
     color: var(--color-g-link);
+    border: 1px solid color-mix(in srgb, var(--color-g-link) 20%, transparent);
   }
-  .week-nav-btn {
+  .week-nav-btn-sm {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     color: var(--color-g-mute);
     background: var(--color-g-elevated);
     border: 1px solid var(--color-g-hairline);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.12s;
+    touch-action: manipulation;
     flex-shrink: 0;
   }
-  .week-nav-btn:hover:not(:disabled) {
+  .week-nav-btn-sm:hover:not(:disabled) {
     color: var(--color-g-link);
     border-color: var(--color-g-link);
     background: color-mix(in srgb, var(--color-g-link) 8%, var(--color-g-elevated));
+    transform: scale(1.05);
   }
-  .week-nav-btn:disabled {
-    opacity: 0.3;
+  .week-nav-btn-sm:disabled {
+    opacity: 0.25;
     cursor: not-allowed;
   }
   .week-pill {
-    padding: 2px 10px;
-    font-size: 10px;
+    padding: 3px 10px;
+    font-size: 11px;
     font-weight: 600;
     font-family: var(--font-mono);
     letter-spacing: 0.02em;
@@ -563,13 +609,25 @@ const { hideTitle = false } = Astro.props;
     background: var(--color-g-elevated);
     color: var(--color-g-body);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.12s;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .week-pill:hover { border-color: var(--color-g-mute); }
   .week-pill-active {
     background: var(--color-g-link);
     color: white;
     border-color: var(--color-g-link);
+  }
+
+  /* Grid smooth slide animation */
+  .grid-slide-anim {
+    animation: gridFade 0.15s cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+  @keyframes gridFade {
+    0% { opacity: 0.7; transform: scale(0.995); }
+    100% { opacity: 1; transform: scale(1); }
   }
 
   /* ── Export PDF button ── */
@@ -587,6 +645,7 @@ const { hideTitle = false } = Astro.props;
     color: var(--color-g-ink);
     cursor: pointer;
     transition: all 0.15s;
+    touch-action: manipulation;
   }
   .export-pdf-btn:hover {
     border-color: var(--color-g-link);
@@ -600,7 +659,7 @@ const { hideTitle = false } = Astro.props;
   interface DB { day: string; hours: number; straight: number; overtime: number; straightPay: number; overtimePay: number; totalPay: number }
   interface R { totalHours: number; straightHours: number; overtimeHours: number; straightPay: number; overtimePay: number; grossPay: number; dailyBreakdown: DB[] }
 
-  // ── Engine: simple weekly threshold (CLT) ──
+  // ── Engine: simple weekly threshold (CLT 44h) ──
   function calcBrazil(days: D[], rate: number, threshold: number, mult: number): R {
     const tot = days.reduce((s, d) => s + d.hours, 0);
     const ot = Math.max(0, tot - threshold);
@@ -645,11 +704,10 @@ const { hideTitle = false } = Astro.props;
     clear:    [0, 0, 0, 0, 0, 0, 0],
   };
 
-  // ── Multi-week helpers ──
   function getNumInputWeeks(): number {
     if (period <= 1) return 1;
     if (period === 2) return 2;
-    return 4; // monthly (4) and annual (52) both use 4 weeks of input
+    return 4; // monthly (4) and annual (52) use 4 weeks of direct input
   }
 
   function getDisplayMultiplier(): number {
@@ -669,6 +727,7 @@ const { hideTitle = false } = Astro.props;
   const dayInputs = document.querySelectorAll('.day-input') as NodeListOf<HTMLInputElement>;
   const canvas = $('earnings-chart') as HTMLCanvasElement;
   const dsrSwitch = $('dsr-switch');
+  const dsrStatusBadge = $('dsr-status-badge');
   const dsrInputsEl = $('dsr-inputs');
   const dsrFormula = $('dsr-formula');
   const dsrCard = $('dsr-card');
@@ -678,23 +737,31 @@ const { hideTitle = false } = Astro.props;
   const weekNav = $('week-nav');
   const weekPillsEl = $('week-pills');
   const weekTotalWrap = $('week-total-wrap');
+  const hoursGridWrapper = $('hours-grid-wrapper') as HTMLElement;
+  const hoursGrid = $('hours-grid') as HTMLElement;
+  const weekPrevBtn = $('week-prev') as HTMLButtonElement;
+  const weekNextBtn = $('week-next') as HTMLButtonElement;
 
-  // ── Week Navigation ──
-  function loadWeek(w: number) {
-    currentWeek = w;
-    const hrs = weeklyHours[w];
-    dayInputs.forEach((inp, i) => { inp.value = String(hrs[i]); });
-    renderWeekNav();
-    highlightPreset();
-    update();
+  // ── Week Navigation (Instant & No-Lag) ──
+  function setupWeekPills(n: number) {
+    weekPillsEl.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const pill = document.createElement('button');
+      pill.className = 'week-pill' + (i === currentWeek ? ' week-pill-active' : '');
+      pill.textContent = `S${i + 1}`;
+      pill.setAttribute('aria-label', `Semana ${i + 1}`);
+      pill.addEventListener('click', () => loadWeek(i));
+      weekPillsEl.appendChild(pill);
+    }
   }
 
-  function renderWeekNav() {
+  function updateWeekNavUI() {
     const n = getNumInputWeeks();
     if (n <= 1) {
       weekIndicator.classList.add('hidden');
       weekNav.classList.add('hidden');
       weekTotalWrap.classList.add('hidden');
+      weekTotalWrap.classList.remove('inline-flex');
       $('total-suffix').textContent = 'hrs/semana';
       return;
     }
@@ -702,41 +769,130 @@ const { hideTitle = false } = Astro.props;
     weekIndicator.classList.remove('hidden');
     weekNav.classList.remove('hidden');
     weekTotalWrap.classList.remove('hidden');
+    weekTotalWrap.classList.add('inline-flex');
 
     $('week-label').textContent = `SEMANA ${currentWeek + 1} DE ${n}`;
 
     const suffixMap: Record<number, string> = { 2: 'hrs', 4: 'hrs', 52: 'hrs (anual)' };
     $('total-suffix').textContent = suffixMap[period] || 'hrs';
 
-    // Render pills
-    weekPillsEl.innerHTML = '';
-    for (let i = 0; i < n; i++) {
-      const pill = document.createElement('button');
-      pill.className = 'week-pill' + (i === currentWeek ? ' week-pill-active' : '');
-      pill.textContent = `S${i + 1}`;
-      pill.addEventListener('click', () => loadWeek(i));
-      weekPillsEl.appendChild(pill);
-    }
+    // Update pill active states (fast, no DOM rebuilding)
+    const pills = weekPillsEl.querySelectorAll('.week-pill');
+    pills.forEach((p, idx) => {
+      p.classList.toggle('week-pill-active', idx === currentWeek);
+    });
 
-    // Prev/Next state
-    ($('week-prev') as HTMLButtonElement).disabled = currentWeek === 0;
-    ($('week-next') as HTMLButtonElement).disabled = currentWeek === n - 1;
+    // Arrow button states
+    weekPrevBtn.disabled = currentWeek === 0;
+    weekNextBtn.disabled = currentWeek === n - 1;
   }
 
-  $('week-prev').addEventListener('click', () => {
+  function loadWeek(w: number, triggerAnimation = true) {
+    const n = getNumInputWeeks();
+    if (w < 0 || w >= n) return;
+    currentWeek = w;
+    const hrs = weeklyHours[w];
+
+    // Update inputs
+    for (let i = 0; i < 7; i++) {
+      dayInputs[i].value = String(hrs[i]);
+    }
+
+    if (triggerAnimation) {
+      hoursGrid.classList.remove('grid-slide-anim');
+      // trigger reflow
+      void hoursGrid.offsetWidth;
+      hoursGrid.classList.add('grid-slide-anim');
+    }
+
+    updateWeekNavUI();
+    highlightPreset();
+    update();
+  }
+
+  weekPrevBtn.addEventListener('click', () => {
     if (currentWeek > 0) loadWeek(currentWeek - 1);
   });
-  $('week-next').addEventListener('click', () => {
+  weekNextBtn.addEventListener('click', () => {
     if (currentWeek < getNumInputWeeks() - 1) loadWeek(currentWeek + 1);
   });
 
-  // ── DSR Toggle (direct, no dropdown) ──
+  // ── Swipe Gestures on Mobile for Week Switching ──
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchDiffX = 0;
+  let isSwiping = false;
+
+  hoursGridWrapper.addEventListener('touchstart', (e) => {
+    if (getNumInputWeeks() <= 1) return;
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    touchDiffX = 0;
+    isSwiping = false;
+  }, { passive: true });
+
+  hoursGridWrapper.addEventListener('touchmove', (e) => {
+    if (getNumInputWeeks() <= 1) return;
+    const t = e.touches[0];
+    const diffX = t.clientX - touchStartX;
+    const diffY = t.clientY - touchStartY;
+
+    if (!isSwiping && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+      isSwiping = true;
+    }
+
+    if (isSwiping) {
+      touchDiffX = diffX;
+      const numWeeks = getNumInputWeeks();
+      let drag = diffX;
+      // Spring resistance at edges
+      if ((currentWeek === 0 && diffX > 0) || (currentWeek === numWeeks - 1 && diffX < 0)) {
+        drag = diffX * 0.2;
+      } else {
+        drag = diffX * 0.45;
+      }
+      hoursGrid.style.transition = 'none';
+      hoursGrid.style.transform = `translateX(${drag}px)`;
+    }
+  }, { passive: true });
+
+  const finishSwipe = () => {
+    if (!isSwiping) return;
+    isSwiping = false;
+    hoursGrid.style.transition = 'transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1)';
+    hoursGrid.style.transform = 'translateX(0)';
+
+    const threshold = 38;
+    const numWeeks = getNumInputWeeks();
+    if (touchDiffX < -threshold && currentWeek < numWeeks - 1) {
+      loadWeek(currentWeek + 1, false);
+    } else if (touchDiffX > threshold && currentWeek > 0) {
+      loadWeek(currentWeek - 1, false);
+    }
+  };
+
+  hoursGridWrapper.addEventListener('touchend', finishSwipe);
+  hoursGridWrapper.addEventListener('touchcancel', () => {
+    if (isSwiping) {
+      isSwiping = false;
+      hoursGrid.style.transition = 'transform 0.18s ease';
+      hoursGrid.style.transform = 'translateX(0)';
+    }
+  });
+
+  // ── DSR Toggle (beside Overtime Multiplier) ──
   dsrSwitch.addEventListener('click', () => {
     dsrEnabled = !dsrEnabled;
     dsrSwitch.setAttribute('aria-checked', String(dsrEnabled));
     dsrInputsEl.classList.toggle('hidden', !dsrEnabled);
     dsrFormula.classList.toggle('hidden', !dsrEnabled);
     dsrCard.style.display = dsrEnabled ? '' : 'none';
+
+    dsrStatusBadge.textContent = dsrEnabled ? 'Sim' : 'Não';
+    dsrStatusBadge.style.color = dsrEnabled ? 'var(--color-g-link)' : 'var(--color-g-mute)';
+    dsrStatusBadge.style.borderColor = dsrEnabled ? 'color-mix(in srgb, var(--color-g-link) 35%, transparent)' : 'var(--color-g-hairline)';
+
     update();
   });
 
@@ -750,7 +906,7 @@ const { hideTitle = false } = Astro.props;
   });
 
   function getMultLabel(): string {
-    return multiplier.toFixed(multiplier % 1 === 0 ? 0 : 1).replace('.', ',');
+    return multiplier.toFixed(multiplier % 1 === 0 ? 0 : 1);
   }
 
   // ── Main update ──
@@ -759,7 +915,6 @@ const { hideTitle = false } = Astro.props;
     const numWeeks = getNumInputWeeks();
     const dispMult = getDisplayMultiplier();
 
-    // Calculate per-week and accumulate
     let sumStraightHours = 0, sumOvertimeHours = 0, sumTotalHours = 0;
     let sumStraightPay = 0, sumOvertimePay = 0;
     let currentWeekResult: R | null = null;
@@ -775,14 +930,13 @@ const { hideTitle = false } = Astro.props;
       if (w === currentWeek) currentWeekResult = r;
     }
 
-    // Apply display multiplier (annual: ×13)
     const dispStraightHours = sumStraightHours * dispMult;
     const dispOvertimeHours = sumOvertimeHours * dispMult;
     const dispTotalHours = sumTotalHours * dispMult;
     const dispStraightPay = sumStraightPay * dispMult;
     const dispOvertimePay = sumOvertimePay * dispMult;
 
-    // DSR (calculated on monthly basis, then scaled to display period)
+    // DSR (calculated on monthly basis, then scaled)
     let dsrDisplay = 0;
     if (dsrEnabled) {
       const workDays = parseInt(dsrWorkDays.value) || 22;
@@ -797,7 +951,7 @@ const { hideTitle = false } = Astro.props;
 
     const grossTotal = dispStraightPay + dispOvertimePay + dsrDisplay;
 
-    // Current week hours for the week-total display
+    // Week hours and total hours
     const weekHrs = weeklyHours[currentWeek].reduce((s, h) => s + h, 0);
     if (numWeeks > 1) {
       $('week-hours').textContent = String(weekHrs);
@@ -824,11 +978,11 @@ const { hideTitle = false } = Astro.props;
     $('overtime-pay').textContent = fmt(dispOvertimePay);
     $('overtime-hours').textContent = String(dispOvertimeHours);
 
-    // Chart (current week, no period scaling — shows single-week view)
+    // Chart
     if (currentWeekResult) drawChart(currentWeekResult);
   }
 
-  // ── Chart ──
+  // ── Chart (optimized, no redraw lag) ──
   const tooltip = $('chart-tooltip');
   interface BarSeg { x: number; yTop: number; yBot: number; type: string; pay: number; hours: number; day: string }
   let barSegs: BarSeg[] = [];
@@ -836,9 +990,16 @@ const { hideTitle = false } = Astro.props;
   function drawChart(r: R) {
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    const targetW = Math.round(rect.width * dpr);
+    const targetH = Math.round(rect.height * dpr);
+
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
+
     const ctx = canvas.getContext('2d')!;
+    ctx.resetTransform();
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, rect.width, rect.height);
 
@@ -933,7 +1094,7 @@ const { hideTitle = false } = Astro.props;
   }, { passive: true });
 
   // ── Events ──
-  // +/- buttons (operate on current week)
+  // +/- buttons
   document.querySelectorAll('.hour-btn').forEach(btn => {
     (btn as HTMLButtonElement).addEventListener('click', () => {
       const d = parseInt((btn as HTMLElement).dataset.day!);
@@ -944,7 +1105,7 @@ const { hideTitle = false } = Astro.props;
     });
   });
 
-  // Direct input typing (synced with current week)
+  // Direct input typing
   dayInputs.forEach((inp, i) => {
     inp.addEventListener('input', () => {
       let v = parseInt(inp.value);
@@ -955,13 +1116,15 @@ const { hideTitle = false } = Astro.props;
     inp.addEventListener('blur', () => { inp.value = String(weeklyHours[currentWeek][i]); });
   });
 
-  // Presets (apply to current week)
+  // Presets
   document.querySelectorAll('.preset-btn').forEach(btn => {
     (btn as HTMLButtonElement).addEventListener('click', () => {
       const p = (btn as HTMLElement).dataset.preset!;
       if (presets[p]) {
         weeklyHours[currentWeek] = [...presets[p]];
-        dayInputs.forEach((inp, i) => { inp.value = String(weeklyHours[currentWeek][i]); });
+        for (let i = 0; i < 7; i++) {
+          dayInputs[i].value = String(weeklyHours[currentWeek][i]);
+        }
         document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('preset-active'));
         btn.classList.add('preset-active');
         update();
@@ -977,23 +1140,23 @@ const { hideTitle = false } = Astro.props;
     });
   }
 
-  // Period buttons — also controls number of input weeks
+  // Period buttons
   document.querySelectorAll('.period-btn').forEach(btn => {
     (btn as HTMLButtonElement).addEventListener('click', () => {
       period = parseInt((btn as HTMLElement).dataset.period!);
       document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('period-active'));
       btn.classList.add('period-active');
 
-      // Resize weeks array and clamp currentWeek
       const numWeeks = getNumInputWeeks();
       ensureWeeks(numWeeks);
       if (currentWeek >= numWeeks) currentWeek = numWeeks - 1;
 
-      loadWeek(currentWeek);
+      setupWeekPills(numWeeks);
+      loadWeek(currentWeek, false);
     });
   });
 
-  // Rate & Slider sync
+  // Rate & Slider
   function syncSlider() {
     const val = parseFloat(slider.value) || 20;
     const min = parseFloat(slider.min) || 7;
@@ -1015,13 +1178,18 @@ const { hideTitle = false } = Astro.props;
 
   // ── PDF Export ──
   $('export-pdf-btn').addEventListener('click', () => {
+    // Sync current active week inputs immediately
+    for (let i = 0; i < 7; i++) {
+      const v = parseInt(dayInputs[i].value);
+      if (!isNaN(v)) weeklyHours[currentWeek][i] = Math.max(0, Math.min(24, v));
+    }
+
     const rate = parseFloat(rateIn.value) || 20;
     const numWeeks = getNumInputWeeks();
     const dispMult = getDisplayMultiplier();
     const periodLabels: Record<number, string> = { 1: '1 Semana', 2: '2 Semanas', 4: 'Mensal (4 sem.)', 52: 'Anual' };
     const periodLabel = periodLabels[period] || `${period} Semanas`;
 
-    // Calculate all weeks
     let sumSP = 0, sumOP = 0, sumSH = 0, sumOH = 0, sumTH = 0;
     const weekResults: R[] = [];
 
@@ -1033,11 +1201,9 @@ const { hideTitle = false } = Astro.props;
       sumSH += r.straightHours; sumOH += r.overtimeHours; sumTH += r.totalHours;
     }
 
-    // Scaled for display
     const dSP = sumSP * dispMult, dOP = sumOP * dispMult;
     const dSH = sumSH * dispMult, dOH = sumOH * dispMult, dTH = sumTH * dispMult;
 
-    // DSR
     let dsrValue = 0;
     let dsrHtml = '';
     if (dsrEnabled) {
@@ -1064,18 +1230,60 @@ const { hideTitle = false } = Astro.props;
     const now = new Date();
     const dateStr = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-    // Rule description
     let ruleDesc = '';
     if (multiplier === 1.5) ruleDesc = 'CLT Art. 59 – Hora Extra 50%';
     else if (multiplier === 2) ruleDesc = 'CLT Art. 59 – Hora Extra 100%';
-    else ruleDesc = `Multiplicador ${multiplier.toFixed(2).replace('.', ',')}×`;
+    else ruleDesc = `Multiplicador ${multiplier.toFixed(2)}×`;
 
-    // Build week tables
+    let weekSummaryTable = '';
+    if (numWeeks > 1) {
+      const summaryRows = weekResults.map((wr, idx) => `
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;font-weight:600;">Semana ${idx + 1}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${wr.straightHours}h</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${wr.overtimeHours}h</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;font-weight:600;">${wr.totalHours}h</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(wr.straightPay)}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(wr.overtimePay)}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:600;">${fmt(wr.grossPay)}</td>
+        </tr>
+      `).join('');
+
+      weekSummaryTable = `
+        <h2>Resumo Consolidado por Semana</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Semana</th>
+              <th>Normal (h)</th>
+              <th>Extra (h)</th>
+              <th>Total (h)</th>
+              <th style="text-align:right">Pag. Normal</th>
+              <th style="text-align:right">Pag. Extra</th>
+              <th style="text-align:right">Total Semana</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${summaryRows}
+            <tr class="totals-row">
+              <td style="padding:8px;">TOTAL (${numWeeks} sem.)</td>
+              <td style="text-align:center;padding:8px;">${sumSH}h</td>
+              <td style="text-align:center;padding:8px;">${sumOH}h</td>
+              <td style="text-align:center;padding:8px;">${sumTH}h</td>
+              <td style="text-align:right;padding:8px;">${fmt(sumSP)}</td>
+              <td style="text-align:right;padding:8px;">${fmt(sumOP)}</td>
+              <td style="text-align:right;padding:8px;">${fmt(sumSP + sumOP)}</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    }
+
     let weekTables = '';
     for (let w = 0; w < numWeeks; w++) {
       const wr = weekResults[w];
       weekTables += numWeeks > 1
-        ? `<h2 style="margin-top:${w > 0 ? '16' : '0'}px;">Semana ${w + 1}</h2>`
+        ? `<h2 style="margin-top:${w > 0 ? '16' : '0'}px;">Semana ${w + 1} — Detalhamento Diário</h2>`
         : `<h2>Detalhamento Diário</h2>`;
 
       weekTables += `<table><thead><tr>
@@ -1106,7 +1314,6 @@ const { hideTitle = false } = Astro.props;
       </tr></tbody></table>`;
     }
 
-    // Scaling note
     let scalingNote = '';
     if (dispMult > 1) {
       scalingNote = `<p style="font-size:11px;color:#888;margin-top:8px;text-align:right;">Valores acima por semana. Resumo abaixo: ${numWeeks} semanas × ${dispMult} = ${numWeeks * dispMult} semanas (${periodLabel}).</p>`;
@@ -1183,6 +1390,7 @@ const { hideTitle = false } = Astro.props;
     </div>
   </div>
 
+  ${weekSummaryTable}
   ${weekTables}
   ${scalingNote}
 
@@ -1233,10 +1441,10 @@ const { hideTitle = false } = Astro.props;
 
   // ── Init ──
   syncSlider();
-  renderWeekNav();
+  setupWeekPills(getNumInputWeeks());
+  updateWeekNavUI();
   update();
 
-  // Theme change observer (dark mode toggle)
   const themeObserver = new MutationObserver(() => {
     syncSlider();
     update();
