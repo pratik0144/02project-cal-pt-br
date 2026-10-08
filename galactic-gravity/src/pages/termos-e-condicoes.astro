@@ -7,7 +7,12 @@ const pageTitle = "Termos e Condições - Calculadora de Horas Extras Online";
 const pageDescription = "Leia os Termos e Condições da Calculadora de Horas Extras Online. Informações sobre uso, isenção de responsabilidade e limitações da ferramenta.";
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbs={[{ name: "Termos e Condições", url: "https://calculadoradehorasextrasonline.com/termos-e-condicoes/" }]}
+  includeFaqSchema={false}
+>
   <Navbar />
   <main class="flex-1">
     <div class="section-container pt-8 sm:pt-12 pb-6 text-center">

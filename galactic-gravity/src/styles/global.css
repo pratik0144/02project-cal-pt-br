@@ -4,9 +4,9 @@
 @theme {
   --color-g-ink: #171717;
   --color-g-on-primary: #ffffff;
-  --color-g-body: #4d4d4d;
-  --color-g-mute: #8f8f8f;
-  --color-g-faint: #a1a1a1;
+  --color-g-body: #404040;
+  --color-g-mute: #5e5e5e;
+  --color-g-faint: #666666;
   --color-g-hairline: #ebebeb;
   --color-g-hairline-soft: #f2f2f2;
   --color-g-canvas: #fafafa;
@@ -31,11 +31,11 @@
 
 /* ── Dark Mode Overrides ── */
 html.dark {
-  --color-g-ink: #e5e5e5;
+  --color-g-ink: #f0f0f0;
   --color-g-on-primary: #141414;
-  --color-g-body: #a1a1a1;
-  --color-g-mute: #666666;
-  --color-g-faint: #555555;
+  --color-g-body: #b8b8b8;
+  --color-g-mute: #a3a3a3;
+  --color-g-faint: #8f8f8f;
   --color-g-hairline: #2a2a2a;
   --color-g-hairline-soft: #1f1f1f;
   --color-g-canvas: #141414;
@@ -114,5 +114,10 @@ html.dark {
   }
   @media (min-width: 640px) {
     .card-lg { padding: 32px; }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-g-link);
+    outline-offset: 2px;
   }
 }

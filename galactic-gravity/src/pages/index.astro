@@ -5,23 +5,29 @@ import Calculator from '../components/Calculator.astro';
 import Footer from '../components/Footer.astro';
 import FAQ from '../components/FAQ.astro';
 import SeoContent from '../components/SeoContent.astro';
+import { legalStatus } from '../data/legal-status';
 
-const pageTitle = "Calculadora de Horas Extras Online Grátis - Calcular Hora Extra CLT (2026)";
-const pageDescription = "Calculadora de horas extras online grátis. Calcule horas extras trabalhadas com adicional de 50% e 100%, DSR sobre horas extras e salário total. Baseada na CLT. Atualizada para 2026.";
+// Title: 59 chars (<= 60 chars)
+const pageTitle = "Calculadora de Horas Extras 2026 (CLT + DSR) - Grátis Online";
+// Meta Description: 157 chars (140-158 chars)
+const pageDescription = "Calcule horas extras a 50% e 100% com DSR pela CLT. Ferramenta grátis, sem cadastro e 100% privada no navegador com suporte a minutos. Simule seu pagamento!";
 ---
 
 <Layout
   title={pageTitle}
   description={pageDescription}
+  canonical="https://calculadoradehorasextrasonline.com/"
 >
   <Navbar />
   <main class="flex-1">
-    <!-- Hero heading -->
+    <!-- Hero heading com Answer-first intro sob H1 -->
     <div class="section-container pt-6 sm:pt-8 text-center">
-      <p class="mono-eyebrow mb-2">LEGISLAÇÃO BRASILEIRA CLT • ATUALIZADO 2026</p>
-      <h1 class="text-2xl sm:text-3xl lg:text-4xl">Calculadora de Horas Extras</h1>
-      <p class="mt-2 text-sm sm:text-base max-w-2xl mx-auto" style="color: var(--color-g-body);">
-        Calcule suas horas extras automaticamente com base na CLT. Insira seu salário mensal ou valor da hora e veja o detalhamento completo do pagamento.
+      <p class="mono-eyebrow mb-2">LEGISLAÇÃO TRABALHISTA CLT • ATUALIZADO EM {legalStatus.lastReviewedFormatted}</p>
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight" style="color: var(--color-g-ink);">
+        Calculadora de Horas Extras
+      </h1>
+      <p class="mt-3 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" style="color: var(--color-g-body);">
+        Esta <strong>calculadora de horas extras</strong> apura instantaneamente o adicional de 50% e 100% e o reflexo do DSR conforme a CLT para {legalStatus.year}. Insira seu salário mensal bruto ou valor da hora, lance jornadas reais com minutos e visualize seus ganhos por semana, mês ou ano com total privacidade no seu navegador.
       </p>
     </div>
 

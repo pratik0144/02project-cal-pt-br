@@ -7,7 +7,12 @@ const pageTitle = "Fale Conosco - Calculadora de Horas Extras Online";
 const pageDescription = "Entre em contato com a Calculadora de Horas Extras Online. Envie um e-mail para contato@calculadoradehorasextrasonline.com para dúvidas, sugestões ou feedback.";
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbs={[{ name: "Fale Conosco", url: "https://calculadoradehorasextrasonline.com/fale-conosco/" }]}
+  includeFaqSchema={false}
+>
   <Navbar />
   <main class="flex-1 flex flex-col justify-center items-center py-16 sm:py-24">
     <div class="section-container text-center max-w-lg mx-auto w-full space-y-6">

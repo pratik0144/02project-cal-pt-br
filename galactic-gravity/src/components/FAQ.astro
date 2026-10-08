@@ -1,100 +1,21 @@
 ---
 /**
- * FAQ.astro: SEO-friendly FAQ section with JSON-LD structured data
- * Renders an interactive accordion and injects FAQPage schema markup
+ * FAQ.astro: Seção de Perguntas Frequentes (FAQ) em HTML semântico com accordion nativo
+ * Renderizado no servidor para indexação perfeita no Google e IA engines.
  */
-
-const faqs = [
-  {
-    question: "Como calcular horas extras?",
-    answer: "O valor da hora extra é calculado multiplicando o valor da sua hora normal de trabalho pelo adicional devido (geralmente 1,5 para o adicional de 50% ou 2 para 100%). Por exemplo, se você tem um salário mensal de R$ 2.500 trabalhando 44 horas semanais, você divide esse valor por 220 para achar sua hora normal (R$ 11,36/hora). Ao aplicar o adicional de 50%, a sua hora extra valerá R$ 17,05. Nossa calculadora faz tudo isso automaticamente para você, permitindo calcular a partir do salário mensal ou do valor da hora."
-  },
-  {
-    question: "A PEC do fim da escala 6x1 já altera o cálculo das horas extras?",
-    answer: "Ainda não. A Proposta de Emenda à Constituição (PEC 221/2019), que extingue a escala 6x1 e reduz a jornada máxima de 44h para 40h semanais, foi aprovada na Câmara dos Deputados em dois turnos em 27 de maio de 2026 e seguiu para o Senado Federal. Para se tornar emenda constitucional válida, precisa ser aprovada em dois turnos no Plenário do Senado por no mínimo 3/5 dos votos (49 senadores) e promulgada. Até a promulgação final, a regra geral da CLT permanece em 44 horas semanais (divisor 220), mas você já pode simular o cenário de 40 horas semanais (divisor 200) na nossa calculadora."
-  },
-  {
-    question: "Como calcular o DSR sobre horas extras?",
-    answer: "Para calcular o DSR (Descanso Semanal Remunerado) sobre as horas extras, a fórmula oficial é: DSR = (Valor total das horas extras ÷ Dias úteis do mês) × Domingos e feriados. Por exemplo: se você fez R$ 300,00 de horas extras num mês com 26 dias úteis e 4 domingos, o cálculo será (300 ÷ 26) × 4 = R$ 46,15 de DSR sobre as horas extras."
-  },
-  {
-    question: "O sábado conta como dia útil no cálculo do DSR?",
-    answer: "Sim! De acordo com a Lei nº 605/1949 e a jurisprudência consolidada do TST (Tribunal Superior do Trabalho), o sábado é considerado dia útil (mesmo que não trabalhado na escala de compensação semanal de segunda a sexta). Para a apuração do DSR, contam-se como descanso unicamente os domingos e feriados civis/religiosos. Em um mês padrão comercial de 30 dias com 4 domingos, consideram-se 26 dias úteis e 4 repousos remunerados."
-  },
-  {
-    question: "Como converter salário mensal em valor da hora normal?",
-    answer: "Para saber o valor da sua hora a partir do seu salário fixo mensal, basta dividir o salário bruto pelo divisor legal da sua jornada semanal: para 44h semanais, divida por 220; para 40h semanais, divida por 200; para 36h semanais, divida por 180; e para 30h semanais, divida por 150. Por exemplo, um salário de R$ 3.000,00 na jornada padrão de 44h equivale a R$ 13,64 por hora (R$ 3.000 ÷ 220)."
-  },
-  {
-    question: "Como funciona a calculadora de horas extras com minutos?",
-    answer: "Para calcular horas extras com minutos, converte-se os minutos em fração decimal de hora dividindo por 60. Por exemplo, 30 minutos equivalem a 0,5h e 48 minutos equivalem a 0,8h (muito comum na escala compensada de 8h48min de segunda a sexta para totalizar 44h). Nossa ferramenta possui campos específicos para horas e minutos em cada dia da semana, calculando frações de minutos com precisão absoluta."
-  },
-  {
-    question: "Como calcular horas extras 100%?",
-    answer: "A hora extra com adicional de 100% é aplicada aos domingos e feriados trabalhados, ou conforme determinado por acordo coletivo. A fórmula é simples: Valor da HE = valor da hora normal × 2. Por exemplo, se a sua hora de trabalho normal custa R$ 20,00, a sua hora extra a 100% valerá R$ 40,00."
-  },
-  {
-    question: "Como calcular horas extras 50%?",
-    answer: "A hora extra a 50% é o padrão para o trabalho extraordinário realizado em dias úteis (segunda a sábado, se o sábado for dia útil de trabalho). A fórmula é: Valor da HE = valor da hora normal × 1,5. Por exemplo, se você ganha R$ 20,00 por hora normal, a sua hora extra com 50% de adicional será R$ 30,00."
-  },
-  {
-    question: "Qual o divisor para jornada na escala 12x36?",
-    answer: "Segundo a jurisprudência amplamente dominante do Tribunal Superior do Trabalho (TST), o divisor aplicado à escala 12×36 é o padrão 220 (salvo se houver norma em convenção coletiva que estipule divisor mais benéfico, como 210 ou 180). Embora a média de horas trabalhadas seja de 42h semanais, a Justiça do Trabalho considera a escala 12x36 um regime de compensação respaldado no limite constitucional de 44 horas semanais."
-  },
-  {
-    question: "Qual o limite de horas extras permitido pela CLT?",
-    answer: "O Artigo 59 da CLT permite a realização de, no máximo, 2 horas extras por dia. O limite mensal varia de acordo com os dias úteis, mas na prática, não deve ultrapassar 44 a 52 horas extras no mês, ressalvadas situações excepcionais de força maior ou previsão de compensação em banco de horas."
-  },
-  {
-    question: "O que é banco de horas e como funciona?",
-    answer: "O banco de horas é um sistema de compensação. Em vez de pagar financeiramente as horas extras, a empresa concede o período correspondente como folga ao trabalhador ou reduz a sua jornada em outros dias. Se for por acordo individual, deve ser compensado em até 6 meses; por acordo coletivo, em até 1 ano. Caso as horas não sejam compensadas no prazo estipulado, deverão ser pagas com o adicional devido."
-  },
-  {
-    question: "Funcionários com salário fixo têm direito a hora extra?",
-    answer: "Sim! Com exceção dos trabalhadores em cargos de gestão, gerência ou de confiança (previstos no Artigo 62 da CLT) ou quem exerce teletrabalho por produção. A imensa maioria dos trabalhadores assalariados, que possuem controle de jornada (ponto), têm direito a receber horas extras caso passem do seu horário contratual."
-  },
-  {
-    question: "Como calcular hora extra noturna?",
-    answer: "A hora extra noturna possui um acréscimo extra. O trabalho noturno (das 22h às 5h para o trabalhador urbano) tem um adicional de 20%. Além disso, a hora noturna é reduzida, durando 52 minutos e 30 segundos. O cálculo da hora extra noturna seria: valor da hora normal × 1,2 (adicional noturno) × 1,5 (adicional de hora extra a 50%, ou 2,0 se for a 100%)."
-  },
-  {
-    question: "Hora extra é descontada no imposto de renda e INSS?",
-    answer: "Sim. O valor recebido de horas extras integra o seu salário bruto, portanto incide tanto a contribuição previdenciária (INSS) quanto o Imposto de Renda Retido na Fonte (IRRF), além de gerar reflexos em FGTS, 13º salário e férias proporcionais."
-  },
-  {
-    question: "Vale a pena fazer hora extra?",
-    answer: "Do ponto de vista financeiro, geralmente sim, pois você recebe no mínimo 50% a mais pelo seu tempo trabalhado. Contudo, você deve considerar o impacto que as horas excedentes terão no seu imposto de renda (pois aumentam a base de cálculo), e principalmente, pesar os efeitos na sua saúde, descanso e tempo livre com a família."
-  }
-];
-
-// Build JSON-LD for FAQPage
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqs.map(faq => ({
-    "@type": "Question",
-    "name": faq.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.answer
-    }
-  }))
-};
+import { faqs } from '../data/faqs';
 ---
 
-<!-- FAQ JSON-LD -->
-<script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
-
-<section class="py-12 sm:py-16" id="faq">
+<section class="py-12 sm:py-16" id="faq" aria-labelledby="faq-heading">
   <div class="section-container">
     <div class="max-w-3xl mx-auto">
       <div class="text-center mb-8">
         <p class="mono-eyebrow mb-2">PERGUNTAS FREQUENTES</p>
-        <h2 class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">
-          FAQ - Calculadora de Horas Extras
+        <h2 id="faq-heading" class="text-xl sm:text-2xl font-semibold" style="color: var(--color-g-ink);">
+          FAQ — Perguntas Frequentes sobre Horas Extras e CLT
         </h2>
-        <p class="mt-2 text-sm sm:text-base" style="color: var(--color-g-body);">
-          Respostas para as dúvidas mais comuns sobre horas extras, DSR, e como usar nossa calculadora.
+        <p class="mt-2 text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
+          Respostas objetivas e fundamentadas na legislação trabalhista brasileira para sanar todas as suas dúvidas sobre horas extras, adicionais de 50% e 100%, DSR e banco de horas.
         </p>
       </div>
 
@@ -163,6 +84,11 @@ const faqJsonLd = {
 
   .faq-question:hover {
     background: color-mix(in srgb, var(--color-g-link) 4%, transparent);
+  }
+
+  .faq-question:focus-visible {
+    outline: 2px solid var(--color-g-link);
+    outline-offset: -2px;
   }
 
   .faq-q-text {

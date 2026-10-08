@@ -9,9 +9,21 @@ interface Props {
   hideTitle?: boolean;
 }
 const { hideTitle = false } = Astro.props;
+
+const dayLabels = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+const dayFullNames = [
+  'segunda-feira',
+  'terça-feira',
+  'quarta-feira',
+  'quinta-feira',
+  'sexta-feira',
+  'sábado',
+  'domingo'
+];
 ---
 
-<section id="calculator" class="py-6 sm:py-8 lg:py-10 flex-1">
+<section id="calculadora" class="py-6 sm:py-8 lg:py-10 flex-1">
+  <div id="calculator" class="sr-only" aria-hidden="true"></div>
   <div class="section-container">
     {!hideTitle && (
       <div class="text-center mb-6">
@@ -33,13 +45,12 @@ const { hideTitle = false } = Astro.props;
               <label for="overtime-mult" class="calc-label">Multiplicador HE</label>
               <div class="relative" style="width: 110px;">
                 <input
-                  type="number"
+                  type="text"
+                  inputmode="decimal"
                   id="overtime-mult"
                   class="calc-input"
-                  value="1.5"
-                  min="1"
-                  max="4"
-                  step="0.05"
+                  value="1,5"
+                  aria-label="Multiplicador de horas extras"
                   style="padding-right: 26px; font-family: var(--font-mono);"
                 />
                 <span class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 14px; font-weight: 600; pointer-events: none;">×</span>
@@ -93,13 +104,12 @@ const { hideTitle = false } = Astro.props;
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 13px; font-weight: 500;">R$</span>
                   <input
-                    type="number"
+                    type="text"
+                    inputmode="decimal"
                     id="monthly-salary"
-                    min="100"
-                    max="100000"
-                    step="50"
-                    value="4400"
+                    value="4.400,00"
                     class="calc-input"
+                    aria-label="Salário bruto mensal"
                     style="padding-left: 34px;"
                   />
                 </div>
@@ -137,7 +147,15 @@ const { hideTitle = false } = Astro.props;
             <div class="flex items-center gap-3">
               <div class="relative flex-1">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 13px; font-weight: 500;">R$</span>
-                <input type="number" id="hourly-rate" min="1" max="1000" step="0.50" value="20.00" class="calc-input" style="padding-left: 34px;" />
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="hourly-rate"
+                  value="20,00"
+                  class="calc-input"
+                  aria-label="Salário por hora base"
+                  style="padding-left: 34px;"
+                />
               </div>
               <input
                 type="range"
@@ -176,11 +194,17 @@ const { hideTitle = false } = Astro.props;
       <div class="mb-5">
         <div id="hours-grid-wrapper" class="relative overflow-hidden touch-pan-y" style="border-radius: 14px;">
           <div class="grid grid-cols-7 gap-1 sm:gap-3 transition-transform" id="hours-grid">
-            {['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'].map((day, i) => (
+            {dayLabels.map((day, i) => (
               <div class="flex flex-col items-center">
                 <span class="day-label">{day}</span>
                 <div class="day-cell">
-                  <button class="hour-btn hour-btn-up" data-day={i} data-action="increase" aria-label={`Aumentar 1h em ${day}`} title="+1 hora">
+                  <button
+                    class="hour-btn hour-btn-up"
+                    data-day={i}
+                    data-action="increase"
+                    aria-label={`Aumentar horas de ${dayFullNames[i]}`}
+                    title={`+1 hora em ${dayFullNames[i]}`}
+                  >
                     <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M5 1.5v7M1.5 5h7"/></svg>
                   </button>
                   <div class="day-time-box">
@@ -194,7 +218,7 @@ const { hideTitle = false } = Astro.props;
                         max="24"
                         step="1"
                         inputmode="numeric"
-                        aria-label={`${day} horas`}
+                        aria-label={`Horas de ${dayFullNames[i]}`}
                       />
                       <span class="day-unit">h</span>
                     </div>
@@ -209,12 +233,18 @@ const { hideTitle = false } = Astro.props;
                         step="1"
                         inputmode="numeric"
                         placeholder="00"
-                        aria-label={`${day} minutos`}
+                        aria-label={`Minutos de ${dayFullNames[i]}`}
                       />
                       <span class="day-unit-min">min</span>
                     </div>
                   </div>
-                  <button class="hour-btn hour-btn-down" data-day={i} data-action="decrease" aria-label={`Diminuir 1h em ${day}`} title="-1 hora">
+                  <button
+                    class="hour-btn hour-btn-down"
+                    data-day={i}
+                    data-action="decrease"
+                    aria-label={`Diminuir horas de ${dayFullNames[i]}`}
+                    title={`-1 hora em ${dayFullNames[i]}`}
+                  >
                     <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="pointer-events-none"><path d="M1.5 5h7"/></svg>
                   </button>
                 </div>
@@ -292,7 +322,7 @@ const { hideTitle = false } = Astro.props;
       <!-- Chart -->
       <div class="chart-wrap">
         <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-          <h3 class="text-sm font-semibold" style="color: var(--color-g-ink);">Ganhos Diários <span id="chart-week-label" class="font-normal" style="color: var(--color-g-mute);"></span></h3>
+          <h2 class="text-sm font-semibold" style="color: var(--color-g-ink);">Ganhos Diários por Jornada <span id="chart-week-label" class="font-normal" style="color: var(--color-g-mute);"></span></h2>
           <span id="period-label" class="mono-eyebrow">Por Semana</span>
         </div>
         <div class="relative" style="height: 180px;">
@@ -857,6 +887,20 @@ const { hideTitle = false } = Astro.props;
   // ── Helpers ──
   const $ = (id: string) => document.getElementById(id)!;
   const fmt = (n: number) => 'R$ ' + (n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtPtBr = (n: number, minDec = 2, maxDec = 2) =>
+    (n || 0).toLocaleString('pt-BR', { minimumFractionDigits: minDec, maximumFractionDigits: maxDec });
+
+  function parsePtBr(str: string): number {
+    if (!str) return 0;
+    let clean = str.trim();
+    if (clean.includes(',') && clean.includes('.')) {
+      clean = clean.replace(/\./g, '').replace(',', '.');
+    } else if (clean.includes(',')) {
+      clean = clean.replace(',', '.');
+    }
+    const val = parseFloat(clean);
+    return isNaN(val) ? 0 : val;
+  }
 
   function fmtHours(h: number): string {
     const totMin = Math.round(h * 60);
@@ -949,11 +993,11 @@ const { hideTitle = false } = Astro.props;
 
   function getEffectiveRate(): number {
     if (salaryMode === 'monthly') {
-      const s = Math.max(0, parseFloat(monthlySalaryIn.value) || 4400);
+      const s = Math.max(0, parsePtBr(monthlySalaryIn.value) || 4400);
       const d = parseInt(journeyDivisorSel.value) || 220;
       return d > 0 ? s / d : 0;
     }
-    return parseFloat(rateIn.value) || 20;
+    return parsePtBr(rateIn.value) || 20;
   }
 
   function getEffectiveThreshold(): number {
@@ -965,10 +1009,10 @@ const { hideTitle = false } = Astro.props;
   }
 
   function updateSalaryBadge() {
-    const s = Math.max(0, parseFloat(monthlySalaryIn.value) || 4400);
+    const s = Math.max(0, parsePtBr(monthlySalaryIn.value) || 4400);
     const d = parseInt(journeyDivisorSel.value) || 220;
     const r = d > 0 ? s / d : 0;
-    rateCalcBadge.innerHTML = `${fmt(r)}/h <span class="font-normal text-[10px]" style="color: var(--color-g-mute);">(R$ ${s.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ÷ ${d})</span>`;
+    rateCalcBadge.innerHTML = `${fmt(r)}/h <span class="font-normal text-[10px]" style="color: var(--color-g-mute);">(R$ ${fmtPtBr(s)} ÷ ${d})</span>`;
   }
 
   // ── Salary Mode Switcher ──
@@ -995,7 +1039,7 @@ const { hideTitle = false } = Astro.props;
 
     const eff = getEffectiveRate();
     if (eff > 0 && !isNaN(eff)) {
-      rateIn.value = eff.toFixed(2);
+      rateIn.value = fmtPtBr(eff);
       slider.value = eff.toFixed(2);
       syncSlider();
     }
@@ -1005,6 +1049,11 @@ const { hideTitle = false } = Astro.props;
   monthlySalaryIn.addEventListener('input', () => {
     updateSalaryBadge();
     update();
+  });
+
+  monthlySalaryIn.addEventListener('blur', () => {
+    const s = parsePtBr(monthlySalaryIn.value);
+    if (s > 0) monthlySalaryIn.value = fmtPtBr(s);
   });
 
   journeyDivisorSel.addEventListener('change', () => {
@@ -1171,8 +1220,11 @@ const { hideTitle = false } = Astro.props;
 
   // ── Multiplier input ──
   multIn.addEventListener('input', () => {
-    multiplier = Math.max(1, Math.min(4, parseFloat(multIn.value) || 1.5));
+    multiplier = Math.max(1, Math.min(4, parsePtBr(multIn.value) || 1.5));
     update();
+  });
+  multIn.addEventListener('blur', () => {
+    multIn.value = getMultLabel();
   });
 
   // ── Main update ──
@@ -1459,7 +1511,7 @@ const { hideTitle = false } = Astro.props;
 
   // Rate & Slider
   function syncSlider() {
-    const val = parseFloat(slider.value) || 20;
+    const val = parsePtBr(rateIn.value) || 20;
     const min = parseFloat(slider.min) || 7;
     const max = parseFloat(slider.max) || 200;
     const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
@@ -1467,12 +1519,18 @@ const { hideTitle = false } = Astro.props;
   }
 
   rateIn.addEventListener('input', () => {
-    slider.value = rateIn.value;
+    const val = parsePtBr(rateIn.value);
+    slider.value = String(val);
     syncSlider();
     update();
   });
+  rateIn.addEventListener('blur', () => {
+    const val = parsePtBr(rateIn.value);
+    if (val > 0) rateIn.value = fmtPtBr(val);
+  });
   slider.addEventListener('input', () => {
-    rateIn.value = parseFloat(slider.value).toFixed(2);
+    const val = parseFloat(slider.value) || 20;
+    rateIn.value = fmtPtBr(val);
     syncSlider();
     update();
   });
@@ -1631,7 +1689,7 @@ const { hideTitle = false } = Astro.props;
 
     const salaryInputLabel = salaryMode === 'monthly' ? 'Salário Mensal / Divisor' : 'Salário/Hora Base';
     const salaryInputValue = salaryMode === 'monthly'
-      ? `${fmt(parseFloat(monthlySalaryIn.value) || 4400)} (Divisor ${journeyDivisorSel.value} &rarr; ${fmt(rate)}/h)`
+      ? `${fmt(parsePtBr(monthlySalaryIn.value) || 4400)} (Divisor ${journeyDivisorSel.value} &rarr; ${fmt(rate)}/h)`
       : `${fmt(rate)}/h`;
 
     const html = `<!DOCTYPE html>

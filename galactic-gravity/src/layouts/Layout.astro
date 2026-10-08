@@ -1,47 +1,137 @@
 ---
 import '../styles/global.css';
+import { faqs } from '../data/faqs';
+import { legalStatus } from '../data/legal-status';
 
 interface Props {
   title?: string;
   description?: string;
+  canonical?: string;
   ogImage?: string;
   ogType?: string;
-  keywords?: string;
   article?: boolean;
   noindex?: boolean;
+  breadcrumbs?: { name: string; url: string }[];
+  includeFaqSchema?: boolean;
 }
 
 const {
-  title = "Calculadora de Horas Extras Online Grátis - Calcular Hora Extra CLT (2026)",
-  description = "Calculadora de horas extras online grátis. Calcule horas extras trabalhadas, adicional de 50% e 100%, DSR sobre horas extras e salário com hora extra. Atualizada para 2026.",
+  title = "Calculadora de Horas Extras 2026 (CLT + DSR) - Grátis Online",
+  description = "Calcule horas extras a 50% e 100% com DSR pela CLT. Ferramenta grátis, sem cadastro e 100% privada no navegador com suporte a minutos. Simule seu pagamento!",
+  canonical,
   ogImage = "https://calculadoradehorasextrasonline.com/og-image.png",
   ogType = "website",
   article = false,
-  noindex = false
+  noindex = false,
+  breadcrumbs,
+  includeFaqSchema = Astro.url.pathname === '/' || Astro.url.pathname === ''
 } = Astro.props;
+
+// Enforce single canonical host (non-www) and strict trailing-slash policy
+const siteUrl = 'https://calculadoradehorasextrasonline.com';
+let pathname = Astro.url.pathname;
+if (!pathname.endsWith('/')) {
+  pathname = `${pathname}/`;
+}
+const canonicalUrl = canonical || (pathname === '/' ? `${siteUrl}/` : `${siteUrl}${pathname}`);
+
+// Verified feature list (strictly reflecting code features)
+const verifiedFeatures = [
+  "Cálculo de hora extra a 50% para dias úteis e sábados",
+  "Cálculo de hora extra a 100% para domingos e feriados",
+  "Multiplicador customizável de horas extras para convenções coletivas",
+  "Cálculo automático de DSR sobre horas extras (Lei nº 605/1949 e Súmula 172 TST)",
+  "Entrada por salário mensal bruto com divisores CLT (220, 200, 180 e 150)",
+  "Entrada direta por valor da hora base com controle deslizante",
+  "Grade semanal com suporte integrado a horas e minutos",
+  "Predefinições rápidas de jornada (5x10, 5x8h48 compensado 44h, 6x8h, 5x8h, 12x36)",
+  "Visualização de períodos: 1 semana, 2 semanas, mensal e anual",
+  "Gráfico interativo de ganhos diários em HTML5 Canvas",
+  "Exportação de relatório e espelho de cálculo em PDF",
+  "Processamento 100% client-side no navegador com sigilo total de dados",
+  "Modo escuro e claro integrado",
+  "Acesso gratuito sem necessidade de cadastro"
+];
+
+// Build single unified @graph JSON-LD
+const graphEntities: any[] = [
+  {
+    "@type": "Organization",
+    "@id": `${siteUrl}/#organization`,
+    "name": "Calculadora de Horas Extras Online",
+    "url": `${siteUrl}/`,
+    "logo": `${siteUrl}/logo.svg`,
+    "email": "contato@calculadoradehorasextrasonline.com"
+  },
+  {
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    "url": `${siteUrl}/`,
+    "name": "Calculadora de Horas Extras Online",
+    "inLanguage": "pt-BR",
+    "publisher": {
+      "@id": `${siteUrl}/#organization`
+    }
+  },
+  {
+    "@type": "WebApplication",
+    "@id": `${siteUrl}/#app`,
+    "name": "Calculadora de Horas Extras",
+    "url": canonicalUrl,
+    "description": description,
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "isAccessibleForFree": true,
+    "inLanguage": "pt-BR",
+    "dateModified": legalStatus.lastReviewed,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "BRL"
+    },
+    "featureList": verifiedFeatures
+  }
+];
+
+if (includeFaqSchema) {
+  graphEntities.push({
+    "@type": "FAQPage",
+    "@id": `${canonicalUrl}#faq`,
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  });
+}
+
+if (breadcrumbs && breadcrumbs.length > 0) {
+  graphEntities.push({
+    "@type": "BreadcrumbList",
+    "@id": `${canonicalUrl}#breadcrumbs`,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Início",
+        "item": `${siteUrl}/`
+      },
+      ...breadcrumbs.map((b, idx) => ({
+        "@type": "ListItem",
+        "position": idx + 2,
+        "name": b.name,
+        "item": b.url
+      }))
+    ]
+  });
+}
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "name": "Calculadora de Horas Extras Online",
-      "description": description,
-      "url": "https://calculadoradehorasextrasonline.com",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "BRL"
-      }
-    },
-    {
-      "@type": "WebSite",
-      "url": "https://calculadoradehorasextrasonline.com",
-      "name": "Calculadora de Horas Extras Online"
-    }
-  ]
+  "@graph": graphEntities
 };
 ---
 
@@ -50,62 +140,66 @@ const jsonLd = {
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
-    <meta name="keywords" content="calculadora de horas extras, calcular horas extras, calcular hora extra, calculo de hora extra, calculadora de horas extras com minutos, calculadora de horas extras e dsr, como calcular horas extras trabalhadas, calculate overtime online" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"} />
-    <meta name="author" content="CalculadoraDeHorasExtrasOnline.com" />
-    
+    <meta name="author" content="Calculadora de Horas Extras Online" />
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
+
+    <!-- Favicons & App Manifest -->
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="HorasExtras" />
     <link rel="manifest" href="/site.webmanifest" />
-    
-    <link rel="alternate" hreflang="pt" href="https://calculadoradehorasextrasonline.com" />
-    <link rel="alternate" hreflang="pt-BR" href="https://calculadoradehorasextrasonline.com" />
-    <link rel="alternate" hreflang="x-default" href="https://calculadoradehorasextrasonline.com" />
-    
-    <link rel="canonical" href={Astro.url.href} />
+
+    <!-- Canonical & Language Alternate (strictly pt-BR self-referencing, no cross-jurisdiction hreflang) -->
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="pt-BR" href={canonicalUrl} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
-    <meta property="og:url" content={Astro.url.href} />
-    <meta property="og:site_name" content="CalculadoraDeHorasExtrasOnline.com" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="Calculadora de Horas Extras Online" />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Calculadora de Horas Extras Online" />
     <meta property="og:locale" content="pt_BR" />
 
-    <!-- Twitter -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content="Calculadora de Horas Extras Online" />
 
-    <!-- Fonts: swap for perf -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Typography: Preconnect & Swap for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
-    <!-- JSON-LD -->
+    <!-- Schema JSON-LD unificado @graph -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-    <!-- Dark mode: apply before paint to prevent flash -->
+    <!-- Dark Mode Pré-paint Handler -->
     <script is:inline>
       (function() {
-        const saved = localStorage.getItem('theme');
-        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark');
-        }
+        try {
+          const saved = localStorage.getItem('theme');
+          if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (_) {}
       })();
     </script>
   </head>

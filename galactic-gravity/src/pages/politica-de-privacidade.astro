@@ -7,7 +7,12 @@ const pageTitle = "Política de Privacidade - Calculadora de Horas Extras Online
 const pageDescription = "Leia a Política de Privacidade da Calculadora de Horas Extras Online. Saiba como priorizamos sua privacidade com cálculos no navegador e armazenamento zero de dados salariais.";
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbs={[{ name: "Política de Privacidade", url: "https://calculadoradehorasextrasonline.com/politica-de-privacidade/" }]}
+  includeFaqSchema={false}
+>
   <Navbar />
   <main class="flex-1">
     <div class="section-container pt-8 sm:pt-12 pb-6 text-center">
