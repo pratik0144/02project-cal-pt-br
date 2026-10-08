@@ -1,8 +1,9 @@
 ---
 /**
  * Calculator.astro: Calculadora de Horas Extras – Brasil (CLT)
- * Sem seleção de estado. Multiplicador fixo 1,5× (configurável).
- * Inclui seção DSR e exportação PDF.
+ * Multiplicador configurável (padrão 1,5×).
+ * Inclui DSR e exportação PDF.
+ * Suporta múltiplas semanas de entrada.
  */
 interface Props {
   hideTitle?: boolean;
@@ -24,16 +25,12 @@ const { hideTitle = false } = Astro.props;
     <div class="card-lg max-w-5xl mx-auto">
       <!-- Controls Row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-        <!-- Overtime Multiplier -->
+        <!-- Overtime Multiplier (simple input) -->
         <div>
-          <label class="calc-label">Multiplicador de Hora Extra</label>
-          <div class="flex flex-wrap gap-1.5" id="mult-btns">
-            <button data-mult="1.5" class="mult-btn mult-active">50% (1,5×)</button>
-            <button data-mult="2" class="mult-btn">100% (2×)</button>
-            <button data-mult="custom" class="mult-btn">Personalizado</button>
-          </div>
-          <div id="custom-mult-wrap" class="hidden mt-2">
-            <input type="number" id="custom-mult" class="calc-input" value="1.75" min="1" max="4" step="0.05" style="max-width: 140px;" aria-label="Multiplicador personalizado" />
+          <label for="overtime-mult" class="calc-label">Multiplicador de Hora Extra</label>
+          <div class="relative" style="max-width: 130px;">
+            <input type="number" id="overtime-mult" class="calc-input" value="1.5" min="1" max="4" step="0.05" style="padding-right: 28px; font-family: var(--font-mono);" />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 14px; font-weight: 600; pointer-events: none;">×</span>
           </div>
         </div>
         <!-- Rate -->
@@ -58,12 +55,6 @@ const { hideTitle = false } = Astro.props;
         </div>
       </div>
 
-      <!-- Rule Badge -->
-      <div class="flex items-center gap-2 mb-5 flex-wrap">
-        <span class="mono-eyebrow">REGRA ATIVA</span>
-        <span id="rule-badge" class="rule-badge">CLT Art. 59 – Hora Extra 50% após 44h/semana</span>
-      </div>
-
       <!-- Presets -->
       <div class="mb-5">
         <p class="mono-eyebrow mb-2">PREDEFINIÇÕES RÁPIDAS</p>
@@ -74,6 +65,11 @@ const { hideTitle = false } = Astro.props;
           <button data-preset="twelve36" class="preset-btn">Jornada 12×36</button>
           <button data-preset="clear" class="preset-btn">Limpar</button>
         </div>
+      </div>
+
+      <!-- Week Indicator (visible when multi-week) -->
+      <div id="week-indicator" class="hidden text-center mb-2">
+        <span id="week-label" class="week-indicator-badge">SEMANA 1 DE 2</span>
       </div>
 
       <!-- Weekly Hours Grid -->
@@ -104,40 +100,45 @@ const { hideTitle = false } = Astro.props;
             </div>
           ))}
         </div>
+
+        <!-- Week Navigation (below grid, visible when multi-week) -->
+        <div id="week-nav" class="hidden flex items-center justify-center gap-1.5 mt-3">
+          <button id="week-prev" class="week-nav-btn" aria-label="Semana anterior">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
+          </button>
+          <div id="week-pills" class="flex gap-1"></div>
+          <button id="week-next" class="week-nav-btn" aria-label="Próxima semana">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+          </button>
+        </div>
+
         <p class="text-center text-xs mt-2" style="color: var(--color-g-mute);">
-          Total: <span id="total-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span> hrs/semana
+          <span id="week-total-wrap" class="hidden">Semana: <span id="week-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span>h · </span>
+          Total: <span id="total-hours" class="font-mono font-semibold" style="color: var(--color-g-ink);">40</span> <span id="total-suffix">hrs/semana</span>
         </p>
       </div>
 
-      <!-- DSR Section (collapsed by default) -->
-      <div id="dsr-section" class="mb-5">
-        <button id="dsr-toggle-btn" type="button" class="flex items-center gap-2 w-full text-left py-1 cursor-pointer" style="background:none;border:none;">
+      <!-- DSR Section (inline toggle — no dropdown) -->
+      <div class="mb-5">
+        <div class="flex items-center gap-3 flex-wrap">
           <span class="mono-eyebrow">DSR SOBRE HORAS EXTRAS</span>
-          <svg class="dsr-chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div id="dsr-panel" class="hidden mt-3 p-4 rounded-lg" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline);">
-          <div class="flex items-center gap-3 mb-3">
-            <label class="calc-label" style="margin-bottom:0;">Incluir DSR</label>
-            <button id="dsr-switch" type="button" role="switch" aria-checked="false" class="dsr-switch">
-              <span class="dsr-switch-thumb"></span>
-            </button>
-          </div>
-          <div id="dsr-inputs" class="hidden grid grid-cols-2 gap-3">
-            <div>
-              <label for="dsr-work-days" class="calc-label">Dias úteis no mês</label>
-              <input type="number" id="dsr-work-days" class="calc-input" value="22" min="1" max="31" />
-            </div>
-            <div>
-              <label for="dsr-sundays" class="calc-label">Domingos e feriados</label>
-              <input type="number" id="dsr-sundays" class="calc-input" value="8" min="0" max="15" />
-            </div>
-          </div>
-          <p id="dsr-formula" class="hidden text-xs mt-3" style="color: var(--color-g-mute); font-family: var(--font-mono);">
-            DSR = (Total HE ÷ Dias Úteis) × Domingos/Feriados
-          </p>
+          <button id="dsr-switch" type="button" role="switch" aria-checked="false" class="dsr-switch">
+            <span class="dsr-switch-thumb"></span>
+          </button>
         </div>
+        <div id="dsr-inputs" class="hidden mt-3 grid grid-cols-2 gap-3" style="max-width: 340px;">
+          <div>
+            <label for="dsr-work-days" class="calc-label">Dias úteis no mês</label>
+            <input type="number" id="dsr-work-days" class="calc-input" value="22" min="1" max="31" />
+          </div>
+          <div>
+            <label for="dsr-sundays" class="calc-label">Domingos e feriados</label>
+            <input type="number" id="dsr-sundays" class="calc-input" value="8" min="0" max="15" />
+          </div>
+        </div>
+        <p id="dsr-formula" class="hidden text-xs mt-2" style="color: var(--color-g-mute); font-family: var(--font-mono);">
+          DSR = (Total HE ÷ Dias Úteis) × Domingos/Feriados
+        </p>
       </div>
 
       <!-- Period Multiplier -->
@@ -178,7 +179,7 @@ const { hideTitle = false } = Astro.props;
       <!-- Chart -->
       <div class="chart-wrap">
         <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-          <h3 class="text-sm font-semibold" style="color: var(--color-g-ink);">Ganhos Diários</h3>
+          <h3 class="text-sm font-semibold" style="color: var(--color-g-ink);">Ganhos Diários <span id="chart-week-label" class="font-normal" style="color: var(--color-g-mute);"></span></h3>
           <span id="period-label" class="mono-eyebrow">Por Semana</span>
         </div>
         <div class="relative" style="height: 180px;">
@@ -298,39 +299,6 @@ const { hideTitle = false } = Astro.props;
     background: transparent;
     border: none;
   }
-
-  .rule-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 10px;
-    font-size: 11px;
-    font-weight: 500;
-    font-family: var(--font-mono);
-    border-radius: 100px;
-    background: color-mix(in srgb, var(--color-g-link) 10%, transparent);
-    color: var(--color-g-link);
-  }
-
-  /* ── Multiplier buttons ── */
-  .mult-btn {
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 500;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-g-hairline);
-    background: var(--color-g-elevated);
-    color: var(--color-g-ink);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .mult-btn:hover { border-color: var(--color-g-mute); }
-  .mult-active {
-    background: var(--color-g-ink);
-    color: var(--color-g-on-primary);
-    border-color: var(--color-g-ink);
-  }
-  .mult-active:hover { opacity: 0.85; }
 
   /* ── Day cells ── */
   .day-label {
@@ -548,13 +516,60 @@ const { hideTitle = false } = Astro.props;
   .dsr-switch[aria-checked='true'] .dsr-switch-thumb {
     transform: translateX(16px);
   }
-  .dsr-chevron {
-    transition: transform 0.2s;
+
+  /* ── Week Navigation ── */
+  .week-indicator-badge {
+    display: inline-block;
+    padding: 2px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    background: color-mix(in srgb, var(--color-g-link) 12%, transparent);
+    color: var(--color-g-link);
+  }
+  .week-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
     color: var(--color-g-mute);
+    background: var(--color-g-elevated);
+    border: 1px solid var(--color-g-hairline);
+    cursor: pointer;
+    transition: all 0.15s;
     flex-shrink: 0;
   }
-  #dsr-section.dsr-open .dsr-chevron {
-    transform: rotate(180deg);
+  .week-nav-btn:hover:not(:disabled) {
+    color: var(--color-g-link);
+    border-color: var(--color-g-link);
+    background: color-mix(in srgb, var(--color-g-link) 8%, var(--color-g-elevated));
+  }
+  .week-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .week-pill {
+    padding: 2px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-pill-cat);
+    border: 1px solid var(--color-g-hairline);
+    background: var(--color-g-elevated);
+    color: var(--color-g-body);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .week-pill:hover { border-color: var(--color-g-mute); }
+  .week-pill-active {
+    background: var(--color-g-link);
+    color: white;
+    border-color: var(--color-g-link);
   }
 
   /* ── Export PDF button ── */
@@ -577,15 +592,13 @@ const { hideTitle = false } = Astro.props;
     border-color: var(--color-g-link);
     color: var(--color-g-link);
   }
-
-  /* Print styles not needed — PDF opens in separate window */
 </style>
 
 <script>
   // ── Types ──
   interface D { day: string; hours: number }
   interface DB { day: string; hours: number; straight: number; overtime: number; straightPay: number; overtimePay: number; totalPay: number }
-  interface R { totalHours: number; straightHours: number; overtimeHours: number; straightPay: number; overtimePay: number; grossPay: number; dailyBreakdown: DB[]; stateRule: string }
+  interface R { totalHours: number; straightHours: number; overtimeHours: number; straightPay: number; overtimePay: number; grossPay: number; dailyBreakdown: DB[] }
 
   // ── Engine: simple weekly threshold (CLT) ──
   function calcBrazil(days: D[], rate: number, threshold: number, mult: number): R {
@@ -607,12 +620,7 @@ const { hideTitle = false } = Astro.props;
       totalHours: tot, straightHours: str, overtimeHours: ot,
       straightPay: str * rate, overtimePay: ot * rate * mult,
       grossPay: str * rate + ot * rate * mult,
-      dailyBreakdown: db,
-      stateRule: mult === 1.5
-        ? 'CLT Art. 59 – Hora Extra 50% após 44h/semana'
-        : mult === 2
-          ? 'CLT Art. 59 – Hora Extra 100% (domingos/feriados)'
-          : `Multiplicador Personalizado: ${mult.toFixed(2).replace('.', ',')}×`
+      dailyBreakdown: db
     };
   }
 
@@ -622,11 +630,12 @@ const { hideTitle = false } = Astro.props;
 
   // ── State ──
   const dayNames = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
-  let hours = [8, 8, 8, 8, 8, 0, 0];
+  let weeklyHours: number[][] = [[8, 8, 8, 8, 8, 0, 0]];
+  let currentWeek = 0;
   let period = 1;
   let multiplier = 1.5;
   let dsrEnabled = false;
-  const THRESHOLD = 44; // CLT standard weekly threshold
+  const THRESHOLD = 44;
 
   const presets: Record<string, number[]> = {
     standard: [8, 8, 8, 8, 8, 0, 0],
@@ -636,34 +645,96 @@ const { hideTitle = false } = Astro.props;
     clear:    [0, 0, 0, 0, 0, 0, 0],
   };
 
-  // ── DOM ──
+  // ── Multi-week helpers ──
+  function getNumInputWeeks(): number {
+    if (period <= 1) return 1;
+    if (period === 2) return 2;
+    return 4; // monthly (4) and annual (52) both use 4 weeks of input
+  }
+
+  function getDisplayMultiplier(): number {
+    return period === 52 ? 13 : 1;
+  }
+
+  function ensureWeeks(n: number) {
+    while (weeklyHours.length < n) {
+      weeklyHours.push([...presets.standard]);
+    }
+  }
+
+  // ── DOM refs ──
   const rateIn = $('hourly-rate') as HTMLInputElement;
   const slider = $('rate-slider') as HTMLInputElement;
+  const multIn = $('overtime-mult') as HTMLInputElement;
   const dayInputs = document.querySelectorAll('.day-input') as NodeListOf<HTMLInputElement>;
   const canvas = $('earnings-chart') as HTMLCanvasElement;
-  const customMultWrap = $('custom-mult-wrap');
-  const customMultIn = $('custom-mult') as HTMLInputElement;
-  const dsrSection = $('dsr-section');
-  const dsrToggleBtn = $('dsr-toggle-btn');
-  const dsrPanel = $('dsr-panel');
   const dsrSwitch = $('dsr-switch');
-  const dsrInputs = $('dsr-inputs');
+  const dsrInputsEl = $('dsr-inputs');
   const dsrFormula = $('dsr-formula');
   const dsrCard = $('dsr-card');
   const dsrWorkDays = $('dsr-work-days') as HTMLInputElement;
   const dsrSundays = $('dsr-sundays') as HTMLInputElement;
+  const weekIndicator = $('week-indicator');
+  const weekNav = $('week-nav');
+  const weekPillsEl = $('week-pills');
+  const weekTotalWrap = $('week-total-wrap');
 
-  // ── DSR Section Toggle ──
-  dsrToggleBtn.addEventListener('click', () => {
-    const isOpen = dsrSection.classList.toggle('dsr-open');
-    dsrPanel.classList.toggle('hidden', !isOpen);
+  // ── Week Navigation ──
+  function loadWeek(w: number) {
+    currentWeek = w;
+    const hrs = weeklyHours[w];
+    dayInputs.forEach((inp, i) => { inp.value = String(hrs[i]); });
+    renderWeekNav();
+    highlightPreset();
+    update();
+  }
+
+  function renderWeekNav() {
+    const n = getNumInputWeeks();
+    if (n <= 1) {
+      weekIndicator.classList.add('hidden');
+      weekNav.classList.add('hidden');
+      weekTotalWrap.classList.add('hidden');
+      $('total-suffix').textContent = 'hrs/semana';
+      return;
+    }
+
+    weekIndicator.classList.remove('hidden');
+    weekNav.classList.remove('hidden');
+    weekTotalWrap.classList.remove('hidden');
+
+    $('week-label').textContent = `SEMANA ${currentWeek + 1} DE ${n}`;
+
+    const suffixMap: Record<number, string> = { 2: 'hrs', 4: 'hrs', 52: 'hrs (anual)' };
+    $('total-suffix').textContent = suffixMap[period] || 'hrs';
+
+    // Render pills
+    weekPillsEl.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const pill = document.createElement('button');
+      pill.className = 'week-pill' + (i === currentWeek ? ' week-pill-active' : '');
+      pill.textContent = `S${i + 1}`;
+      pill.addEventListener('click', () => loadWeek(i));
+      weekPillsEl.appendChild(pill);
+    }
+
+    // Prev/Next state
+    ($('week-prev') as HTMLButtonElement).disabled = currentWeek === 0;
+    ($('week-next') as HTMLButtonElement).disabled = currentWeek === n - 1;
+  }
+
+  $('week-prev').addEventListener('click', () => {
+    if (currentWeek > 0) loadWeek(currentWeek - 1);
+  });
+  $('week-next').addEventListener('click', () => {
+    if (currentWeek < getNumInputWeeks() - 1) loadWeek(currentWeek + 1);
   });
 
-  // ── DSR Switch ──
+  // ── DSR Toggle (direct, no dropdown) ──
   dsrSwitch.addEventListener('click', () => {
     dsrEnabled = !dsrEnabled;
     dsrSwitch.setAttribute('aria-checked', String(dsrEnabled));
-    dsrInputs.classList.toggle('hidden', !dsrEnabled);
+    dsrInputsEl.classList.toggle('hidden', !dsrEnabled);
     dsrFormula.classList.toggle('hidden', !dsrEnabled);
     dsrCard.style.display = dsrEnabled ? '' : 'none';
     update();
@@ -672,25 +743,9 @@ const { hideTitle = false } = Astro.props;
   dsrWorkDays.addEventListener('input', update);
   dsrSundays.addEventListener('input', update);
 
-  // ── Multiplier buttons ──
-  document.querySelectorAll('.mult-btn').forEach(btn => {
-    (btn as HTMLButtonElement).addEventListener('click', () => {
-      document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('mult-active'));
-      btn.classList.add('mult-active');
-      const val = (btn as HTMLElement).dataset.mult!;
-      if (val === 'custom') {
-        customMultWrap.classList.remove('hidden');
-        multiplier = parseFloat(customMultIn.value) || 1.75;
-      } else {
-        customMultWrap.classList.add('hidden');
-        multiplier = parseFloat(val);
-      }
-      update();
-    });
-  });
-
-  customMultIn.addEventListener('input', () => {
-    multiplier = Math.max(1, Math.min(4, parseFloat(customMultIn.value) || 1.5));
+  // ── Multiplier input ──
+  multIn.addEventListener('input', () => {
+    multiplier = Math.max(1, Math.min(4, parseFloat(multIn.value) || 1.5));
     update();
   });
 
@@ -701,42 +756,76 @@ const { hideTitle = false } = Astro.props;
   // ── Main update ──
   function update() {
     const rate = parseFloat(rateIn.value) || 20;
-    const days: D[] = dayNames.map((n, i) => ({ day: n, hours: hours[i] }));
-    const r = calcBrazil(days, rate, THRESHOLD, multiplier);
-    const p = period;
-    const periodLabels: Record<number, string> = { 1: 'Por Semana', 2: 'Por 2 Semanas', 4: 'Por Mês (4 sem.)', 52: 'Por Ano' };
+    const numWeeks = getNumInputWeeks();
+    const dispMult = getDisplayMultiplier();
 
-    // Sync inputs
-    dayInputs.forEach((el, i) => { el.value = String(hours[i]); });
-    $('total-hours').textContent = String(r.totalHours);
-    $('rule-badge').textContent = r.stateRule;
-    $('period-label').textContent = periodLabels[p] || `Por ${p} Semanas`;
+    // Calculate per-week and accumulate
+    let sumStraightHours = 0, sumOvertimeHours = 0, sumTotalHours = 0;
+    let sumStraightPay = 0, sumOvertimePay = 0;
+    let currentWeekResult: R | null = null;
+
+    for (let w = 0; w < numWeeks; w++) {
+      const days: D[] = dayNames.map((n, i) => ({ day: n, hours: weeklyHours[w][i] }));
+      const r = calcBrazil(days, rate, THRESHOLD, multiplier);
+      sumStraightHours += r.straightHours;
+      sumOvertimeHours += r.overtimeHours;
+      sumTotalHours += r.totalHours;
+      sumStraightPay += r.straightPay;
+      sumOvertimePay += r.overtimePay;
+      if (w === currentWeek) currentWeekResult = r;
+    }
+
+    // Apply display multiplier (annual: ×13)
+    const dispStraightHours = sumStraightHours * dispMult;
+    const dispOvertimeHours = sumOvertimeHours * dispMult;
+    const dispTotalHours = sumTotalHours * dispMult;
+    const dispStraightPay = sumStraightPay * dispMult;
+    const dispOvertimePay = sumOvertimePay * dispMult;
+
+    // DSR (calculated on monthly basis, then scaled to display period)
+    let dsrDisplay = 0;
+    if (dsrEnabled) {
+      const workDays = parseInt(dsrWorkDays.value) || 22;
+      const sundays = parseInt(dsrSundays.value) || 8;
+      const monthlyOT = sumOvertimePay * (4 / numWeeks);
+      const monthlyDSR = workDays > 0 ? (monthlyOT / workDays) * sundays : 0;
+      const dsrScales: Record<number, number> = { 1: 0.25, 2: 0.5, 4: 1, 52: 12 };
+      dsrDisplay = monthlyDSR * (dsrScales[period] ?? 1);
+      $('dsr-pay').textContent = fmt(dsrDisplay);
+      $('dsr-ref-days').textContent = String(sundays);
+    }
+
+    const grossTotal = dispStraightPay + dispOvertimePay + dsrDisplay;
+
+    // Current week hours for the week-total display
+    const weekHrs = weeklyHours[currentWeek].reduce((s, h) => s + h, 0);
+    if (numWeeks > 1) {
+      $('week-hours').textContent = String(weekHrs);
+    }
+    $('total-hours').textContent = String(dispTotalHours);
+
+    // Period label
+    const periodLabels: Record<number, string> = { 1: 'Por Semana', 2: 'Por 2 Semanas', 4: 'Por Mês', 52: 'Por Ano' };
+    $('period-label').textContent = periodLabels[period] || `Por ${period} Semanas`;
+
+    // Chart week label
+    $('chart-week-label').textContent = numWeeks > 1 ? `— Semana ${currentWeek + 1}` : '';
 
     // Mult labels
     const ml = getMultLabel();
     $('mult-label-card').textContent = ml;
     $('mult-label-legend').textContent = ml;
 
-    // DSR calculation
-    let dsrValue = 0;
-    if (dsrEnabled) {
-      const workDays = parseInt(dsrWorkDays.value) || 22;
-      const sundays = parseInt(dsrSundays.value) || 8;
-      dsrValue = workDays > 0 ? (r.overtimePay / workDays) * sundays : 0;
-      $('dsr-pay').textContent = fmt(dsrValue * p);
-      $('dsr-ref-days').textContent = String(sundays);
-    }
-
-    // Pay cards (multiplied by period)
-    const grossTotal = (r.grossPay + dsrValue) * p;
+    // Pay cards
     $('gross-pay').textContent = fmt(grossTotal);
-    $('gross-hours').textContent = String(r.totalHours * p);
-    $('straight-pay').textContent = fmt(r.straightPay * p);
-    $('straight-hours').textContent = String(r.straightHours * p);
-    $('overtime-pay').textContent = fmt(r.overtimePay * p);
-    $('overtime-hours').textContent = String(r.overtimeHours * p);
+    $('gross-hours').textContent = String(dispTotalHours);
+    $('straight-pay').textContent = fmt(dispStraightPay);
+    $('straight-hours').textContent = String(dispStraightHours);
+    $('overtime-pay').textContent = fmt(dispOvertimePay);
+    $('overtime-hours').textContent = String(dispOvertimeHours);
 
-    drawChart(r);
+    // Chart (current week, no period scaling — shows single-week view)
+    if (currentWeekResult) drawChart(currentWeekResult);
   }
 
   // ── Chart ──
@@ -745,7 +834,6 @@ const { hideTitle = false } = Astro.props;
   let barSegs: BarSeg[] = [];
 
   function drawChart(r: R) {
-    const p = period;
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
@@ -755,7 +843,7 @@ const { hideTitle = false } = Astro.props;
     ctx.clearRect(0, 0, rect.width, rect.height);
 
     const db = r.dailyBreakdown;
-    const maxPay = Math.max(...db.map(d => d.totalPay * p), 1);
+    const maxPay = Math.max(...db.map(d => d.totalPay), 1);
     const pad = { top: 12, bottom: 22, left: 44, right: 6 };
     const cW = rect.width - pad.left - pad.right;
     const cH = rect.height - pad.top - pad.bottom;
@@ -787,7 +875,7 @@ const { hideTitle = false } = Astro.props;
     ctx.textAlign = 'center';
     db.forEach((d, i) => {
       const x = pad.left + gap + i * (barW + gap);
-      const sP = d.straightPay * p, oP = d.overtimePay * p;
+      const sP = d.straightPay, oP = d.overtimePay;
       const sH = (sP / maxPay) * cH;
       const oH = (oP / maxPay) * cH;
       let y = pad.top + cH;
@@ -797,7 +885,7 @@ const { hideTitle = false } = Astro.props;
         const top = y - sH;
         ctx.fillStyle = colors.s;
         ctx.beginPath(); ctx.roundRect(x, top, barW, sH, radius); ctx.fill();
-        barSegs.push({ x, yTop: top, yBot: y, type: 'Normal (1×)', pay: sP, hours: d.straight * p, day: d.day });
+        barSegs.push({ x, yTop: top, yBot: y, type: 'Normal (1×)', pay: sP, hours: d.straight, day: d.day });
         y = top - segGap;
       }
       // Overtime
@@ -805,7 +893,7 @@ const { hideTitle = false } = Astro.props;
         const top = y - oH;
         ctx.fillStyle = colors.o;
         ctx.beginPath(); ctx.roundRect(x, top, barW, oH, radius); ctx.fill();
-        barSegs.push({ x, yTop: top, yBot: y, type: `Hora Extra (${getMultLabel()}×)`, pay: oP, hours: d.overtime * p, day: d.day });
+        barSegs.push({ x, yTop: top, yBot: y, type: `Hora Extra (${getMultLabel()}×)`, pay: oP, hours: d.overtime, day: d.day });
       }
 
       // Day label
@@ -845,34 +933,38 @@ const { hideTitle = false } = Astro.props;
   }, { passive: true });
 
   // ── Events ──
-  // +/- buttons
+  // +/- buttons (operate on current week)
   document.querySelectorAll('.hour-btn').forEach(btn => {
     (btn as HTMLButtonElement).addEventListener('click', () => {
       const d = parseInt((btn as HTMLElement).dataset.day!);
-      if ((btn as HTMLElement).dataset.action === 'increase' && hours[d] < 24) hours[d]++;
-      if ((btn as HTMLElement).dataset.action === 'decrease' && hours[d] > 0) hours[d]--;
+      if ((btn as HTMLElement).dataset.action === 'increase' && weeklyHours[currentWeek][d] < 24) weeklyHours[currentWeek][d]++;
+      if ((btn as HTMLElement).dataset.action === 'decrease' && weeklyHours[currentWeek][d] > 0) weeklyHours[currentWeek][d]--;
+      dayInputs[d].value = String(weeklyHours[currentWeek][d]);
       highlightPreset(); update();
     });
   });
 
-  // Direct input typing
+  // Direct input typing (synced with current week)
   dayInputs.forEach((inp, i) => {
     inp.addEventListener('input', () => {
       let v = parseInt(inp.value);
       if (isNaN(v)) v = 0;
-      hours[i] = Math.max(0, Math.min(24, v));
+      weeklyHours[currentWeek][i] = Math.max(0, Math.min(24, v));
       highlightPreset(); update();
     });
-    inp.addEventListener('blur', () => { inp.value = String(hours[i]); });
+    inp.addEventListener('blur', () => { inp.value = String(weeklyHours[currentWeek][i]); });
   });
 
-  // Presets
+  // Presets (apply to current week)
   document.querySelectorAll('.preset-btn').forEach(btn => {
     (btn as HTMLButtonElement).addEventListener('click', () => {
       const p = (btn as HTMLElement).dataset.preset!;
-      if (presets[p]) { hours = [...presets[p]];
+      if (presets[p]) {
+        weeklyHours[currentWeek] = [...presets[p]];
+        dayInputs.forEach((inp, i) => { inp.value = String(weeklyHours[currentWeek][i]); });
         document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('preset-active'));
-        btn.classList.add('preset-active'); update();
+        btn.classList.add('preset-active');
+        update();
       }
     });
   });
@@ -880,21 +972,28 @@ const { hideTitle = false } = Astro.props;
   function highlightPreset() {
     document.querySelectorAll('.preset-btn').forEach(btn => {
       const p = (btn as HTMLElement).dataset.preset!;
-      if (presets[p] && JSON.stringify(hours) === JSON.stringify(presets[p])) btn.classList.add('preset-active');
+      if (presets[p] && JSON.stringify(weeklyHours[currentWeek]) === JSON.stringify(presets[p])) btn.classList.add('preset-active');
       else btn.classList.remove('preset-active');
     });
   }
 
-  // Period multiplier
+  // Period buttons — also controls number of input weeks
   document.querySelectorAll('.period-btn').forEach(btn => {
     (btn as HTMLButtonElement).addEventListener('click', () => {
       period = parseInt((btn as HTMLElement).dataset.period!);
       document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('period-active'));
-      btn.classList.add('period-active'); update();
+      btn.classList.add('period-active');
+
+      // Resize weeks array and clamp currentWeek
+      const numWeeks = getNumInputWeeks();
+      ensureWeeks(numWeeks);
+      if (currentWeek >= numWeeks) currentWeek = numWeeks - 1;
+
+      loadWeek(currentWeek);
     });
   });
 
-  // Rate & Slider
+  // Rate & Slider sync
   function syncSlider() {
     const val = parseFloat(slider.value) || 20;
     const min = parseFloat(slider.min) || 7;
@@ -914,49 +1013,108 @@ const { hideTitle = false } = Astro.props;
     update();
   });
 
-  // PDF Export — structured calculation report in a new window
+  // ── PDF Export ──
   $('export-pdf-btn').addEventListener('click', () => {
     const rate = parseFloat(rateIn.value) || 20;
-    const days: D[] = dayNames.map((n, i) => ({ day: n, hours: hours[i] }));
-    const r = calcBrazil(days, rate, THRESHOLD, multiplier);
-    const p = period;
+    const numWeeks = getNumInputWeeks();
+    const dispMult = getDisplayMultiplier();
     const periodLabels: Record<number, string> = { 1: '1 Semana', 2: '2 Semanas', 4: 'Mensal (4 sem.)', 52: 'Anual' };
-    const periodLabel = periodLabels[p] || `${p} Semanas`;
+    const periodLabel = periodLabels[period] || `${period} Semanas`;
 
+    // Calculate all weeks
+    let sumSP = 0, sumOP = 0, sumSH = 0, sumOH = 0, sumTH = 0;
+    const weekResults: R[] = [];
+
+    for (let w = 0; w < numWeeks; w++) {
+      const days: D[] = dayNames.map((n, i) => ({ day: n, hours: weeklyHours[w][i] }));
+      const r = calcBrazil(days, rate, THRESHOLD, multiplier);
+      weekResults.push(r);
+      sumSP += r.straightPay; sumOP += r.overtimePay;
+      sumSH += r.straightHours; sumOH += r.overtimeHours; sumTH += r.totalHours;
+    }
+
+    // Scaled for display
+    const dSP = sumSP * dispMult, dOP = sumOP * dispMult;
+    const dSH = sumSH * dispMult, dOH = sumOH * dispMult, dTH = sumTH * dispMult;
+
+    // DSR
     let dsrValue = 0;
     let dsrHtml = '';
     if (dsrEnabled) {
       const workDays = parseInt(dsrWorkDays.value) || 22;
       const sundays = parseInt(dsrSundays.value) || 8;
-      dsrValue = workDays > 0 ? (r.overtimePay / workDays) * sundays : 0;
+      const monthlyOT = sumOP * (4 / numWeeks);
+      const monthlyDSR = workDays > 0 ? (monthlyOT / workDays) * sundays : 0;
+      const dsrScales: Record<number, number> = { 1: 0.25, 2: 0.5, 4: 1, 52: 12 };
+      dsrValue = monthlyDSR * (dsrScales[period] ?? 1);
+
       dsrHtml = `
         <div style="margin-top:20px;padding:16px;border:1px solid #d1d5db;border-radius:8px;background:#f0fdf4;">
           <h3 style="margin:0 0 10px;font-size:14px;font-weight:600;color:#166534;">DSR sobre Horas Extras</h3>
           <table style="width:100%;font-size:13px;border-collapse:collapse;">
             <tr><td style="padding:4px 0;color:#555;">Dias úteis no mês</td><td style="text-align:right;font-weight:600;">${workDays}</td></tr>
             <tr><td style="padding:4px 0;color:#555;">Domingos e feriados</td><td style="text-align:right;font-weight:600;">${sundays}</td></tr>
-            <tr><td style="padding:4px 0;color:#555;">Fórmula</td><td style="text-align:right;font-family:monospace;font-size:11px;">(${fmt(r.overtimePay)} ÷ ${workDays}) × ${sundays}</td></tr>
-            <tr style="border-top:1px solid #d1d5db;"><td style="padding:8px 0 4px;font-weight:600;color:#166534;">Valor DSR (semanal)</td><td style="text-align:right;font-weight:700;font-size:15px;color:#166534;">${fmt(dsrValue)}</td></tr>
-            ${p > 1 ? `<tr><td style="padding:4px 0;color:#555;">Valor DSR (${periodLabel})</td><td style="text-align:right;font-weight:600;">${fmt(dsrValue * p)}</td></tr>` : ''}
+            <tr><td style="padding:4px 0;color:#555;">DSR mensal</td><td style="text-align:right;font-weight:600;">${fmt(monthlyDSR)}</td></tr>
+            <tr style="border-top:1px solid #d1d5db;"><td style="padding:8px 0 4px;font-weight:600;color:#166534;">DSR (${periodLabel})</td><td style="text-align:right;font-weight:700;font-size:15px;color:#166534;">${fmt(dsrValue)}</td></tr>
           </table>
         </div>`;
     }
 
-    const grossTotal = (r.grossPay + dsrValue) * p;
+    const grossTotal = dSP + dOP + dsrValue;
     const now = new Date();
     const dateStr = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-    // Build daily breakdown rows
-    const dayRows = r.dailyBreakdown.map(d => `
-      <tr>
-        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;font-weight:500;">${d.day}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.hours}h</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.straight}h</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.overtime}h</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(d.straightPay)}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(d.overtimePay)}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:600;">${fmt(d.totalPay)}</td>
-      </tr>`).join('');
+    // Rule description
+    let ruleDesc = '';
+    if (multiplier === 1.5) ruleDesc = 'CLT Art. 59 – Hora Extra 50%';
+    else if (multiplier === 2) ruleDesc = 'CLT Art. 59 – Hora Extra 100%';
+    else ruleDesc = `Multiplicador ${multiplier.toFixed(2).replace('.', ',')}×`;
+
+    // Build week tables
+    let weekTables = '';
+    for (let w = 0; w < numWeeks; w++) {
+      const wr = weekResults[w];
+      weekTables += numWeeks > 1
+        ? `<h2 style="margin-top:${w > 0 ? '16' : '0'}px;">Semana ${w + 1}</h2>`
+        : `<h2>Detalhamento Diário</h2>`;
+
+      weekTables += `<table><thead><tr>
+        <th>Dia</th><th>Total</th><th>Normal</th><th>Extra</th>
+        <th style="text-align:right">Pag. Normal</th><th style="text-align:right">Pag. Extra</th><th style="text-align:right">Total Dia</th>
+      </tr></thead><tbody>`;
+
+      wr.dailyBreakdown.forEach(d => {
+        weekTables += `<tr>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;font-weight:500;">${d.day}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.hours}h</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.straight}h</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center;">${d.overtime}h</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(d.straightPay)}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;">${fmt(d.overtimePay)}</td>
+          <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:600;">${fmt(d.totalPay)}</td>
+        </tr>`;
+      });
+
+      weekTables += `<tr class="totals-row">
+        <td style="padding:8px;">TOTAL</td>
+        <td style="text-align:center;padding:8px;">${wr.totalHours}h</td>
+        <td style="text-align:center;padding:8px;">${wr.straightHours}h</td>
+        <td style="text-align:center;padding:8px;">${wr.overtimeHours}h</td>
+        <td style="text-align:right;padding:8px;">${fmt(wr.straightPay)}</td>
+        <td style="text-align:right;padding:8px;">${fmt(wr.overtimePay)}</td>
+        <td style="text-align:right;padding:8px;">${fmt(wr.grossPay)}</td>
+      </tr></tbody></table>`;
+    }
+
+    // Scaling note
+    let scalingNote = '';
+    if (dispMult > 1) {
+      scalingNote = `<p style="font-size:11px;color:#888;margin-top:8px;text-align:right;">Valores acima por semana. Resumo abaixo: ${numWeeks} semanas × ${dispMult} = ${numWeeks * dispMult} semanas (${periodLabel}).</p>`;
+    } else if (numWeeks > 1) {
+      scalingNote = `<p style="font-size:11px;color:#888;margin-top:8px;text-align:right;">Resumo abaixo: soma de ${numWeeks} semanas.</p>`;
+    }
+
+    const numCards = dsrEnabled ? 4 : 3;
 
     const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -980,7 +1138,7 @@ const { hideTitle = false } = Astro.props;
     thead th:not(:first-child) { text-align: center; }
     thead th:nth-child(n+5) { text-align: right; }
     .totals-row td { font-weight: 700; border-top: 2px solid #1a1a1a; padding-top: 8px; }
-    .summary-cards { display: grid; grid-template-columns: repeat(${dsrEnabled ? 4 : 3}, 1fr); gap: 12px; margin-top: 20px; }
+    .summary-cards { display: grid; grid-template-columns: repeat(${numCards}, 1fr); gap: 12px; margin-top: 20px; }
     .summary-card { padding: 14px; border: 1px solid #e5e7eb; border-radius: 8px; }
     .summary-card.gross { border: 2px solid #0d9488; background: #f0fdfa; }
     .summary-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; font-weight: 500; margin-bottom: 4px; }
@@ -1005,7 +1163,7 @@ const { hideTitle = false } = Astro.props;
     </div>
     <div class="header-right">
       <p>${dateStr}</p>
-      <p>Período: ${periodLabel}</p>
+      <p>Período: ${periodLabel}${numWeeks > 1 ? ` (${numWeeks} semanas)` : ''}</p>
     </div>
   </div>
 
@@ -1021,60 +1179,34 @@ const { hideTitle = false } = Astro.props;
     </div>
     <div class="input-box">
       <div class="label">Regra Aplicada</div>
-      <div class="value" style="font-size:11px;line-height:1.4;">${r.stateRule}</div>
+      <div class="value" style="font-size:11px;line-height:1.4;">${ruleDesc}</div>
     </div>
   </div>
 
-  <h2>Detalhamento Diário</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Dia</th>
-        <th>Total</th>
-        <th>Normal</th>
-        <th>Extra</th>
-        <th style="text-align:right">Pag. Normal</th>
-        <th style="text-align:right">Pag. Extra</th>
-        <th style="text-align:right">Total Dia</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${dayRows}
-      <tr class="totals-row">
-        <td style="padding:8px;">TOTAL</td>
-        <td style="text-align:center;padding:8px;">${r.totalHours}h</td>
-        <td style="text-align:center;padding:8px;">${r.straightHours}h</td>
-        <td style="text-align:center;padding:8px;">${r.overtimeHours}h</td>
-        <td style="text-align:right;padding:8px;">${fmt(r.straightPay)}</td>
-        <td style="text-align:right;padding:8px;">${fmt(r.overtimePay)}</td>
-        <td style="text-align:right;padding:8px;">${fmt(r.grossPay)}</td>
-      </tr>
-    </tbody>
-  </table>
+  ${weekTables}
+  ${scalingNote}
 
-  ${p > 1 ? `<p style="font-size:11px;color:#888;margin-top:8px;text-align:right;">Valores acima são por semana. Veja o resumo abaixo para o período selecionado (${periodLabel}).</p>` : ''}
-
-  <h2>Resumo do Pagamento${p > 1 ? ` — ${periodLabel}` : ''}</h2>
+  <h2>Resumo do Pagamento — ${periodLabel}</h2>
   <div class="summary-cards">
     <div class="summary-card gross">
       <div class="label">Remuneração Bruta</div>
       <div class="amount">${fmt(grossTotal)}</div>
-      <div class="sub">${r.totalHours * p}h total</div>
+      <div class="sub">${dTH}h total</div>
     </div>
     <div class="summary-card">
       <div class="label">Normal (1×)</div>
-      <div class="amount">${fmt(r.straightPay * p)}</div>
-      <div class="sub">${r.straightHours * p}h</div>
+      <div class="amount">${fmt(dSP)}</div>
+      <div class="sub">${dSH}h</div>
     </div>
     <div class="summary-card">
       <div class="label">Hora Extra (${getMultLabel()}×)</div>
-      <div class="amount">${fmt(r.overtimePay * p)}</div>
-      <div class="sub">${r.overtimeHours * p}h</div>
+      <div class="amount">${fmt(dOP)}</div>
+      <div class="sub">${dOH}h</div>
     </div>
     ${dsrEnabled ? `
     <div class="summary-card" style="border-color:#166534;background:#f0fdf4;">
       <div class="label" style="color:#166534;">DSR sobre HE</div>
-      <div class="amount" style="color:#166534;">${fmt(dsrValue * p)}</div>
+      <div class="amount" style="color:#166534;">${fmt(dsrValue)}</div>
       <div class="sub">Ref. ${parseInt(dsrSundays.value) || 8} dias</div>
     </div>` : ''}
   </div>
@@ -1095,14 +1227,16 @@ const { hideTitle = false } = Astro.props;
     }
   });
 
-  // Resize
+  // Resize handler
   let rt: ReturnType<typeof setTimeout>;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(update, 100); });
 
-  // Init
+  // ── Init ──
   syncSlider();
+  renderWeekNav();
   update();
 
+  // Theme change observer (dark mode toggle)
   const themeObserver = new MutationObserver(() => {
     syncSlider();
     update();
