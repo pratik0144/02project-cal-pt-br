@@ -191,22 +191,22 @@ const { hideTitle = false } = Astro.props;
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6" id="pay-cards">
         <div class="pay-card" style="border: 2px solid color-mix(in srgb, var(--color-g-gross) 30%, transparent); background: color-mix(in srgb, var(--color-g-gross) 8%, var(--color-g-elevated));">
           <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-gross);">REMUNERAÇÃO BRUTA</p>
-          <p class="pay-amount" id="gross-pay">R$&nbsp;800,00</p>
+          <p class="pay-amount" id="gross-pay">R$&nbsp;800.00</p>
           <p class="pay-sub"><span id="gross-hours" class="font-mono">40</span>h total</p>
         </div>
         <div class="pay-card pay-card-border">
           <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-straight);">NORMAL (1×)</p>
-          <p class="pay-amount" id="straight-pay">R$&nbsp;800,00</p>
+          <p class="pay-amount" id="straight-pay">R$&nbsp;800.00</p>
           <p class="pay-sub"><span id="straight-hours" class="font-mono">40</span>h</p>
         </div>
         <div class="pay-card pay-card-border">
           <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-overtime);">HORA EXTRA (<span id="mult-label-card">1.5</span>×)</p>
-          <p class="pay-amount" id="overtime-pay">R$&nbsp;0,00</p>
+          <p class="pay-amount" id="overtime-pay">R$&nbsp;0.00</p>
           <p class="pay-sub"><span id="overtime-hours" class="font-mono">0</span>h</p>
         </div>
         <div class="pay-card pay-card-border" id="dsr-card" style="display:none;">
           <p class="mono-eyebrow mb-0.5" style="color: var(--color-g-doubletime);">DSR SOBRE HE</p>
-          <p class="pay-amount" id="dsr-pay">R$&nbsp;0,00</p>
+          <p class="pay-amount" id="dsr-pay">R$&nbsp;0.00</p>
           <p class="pay-sub">Ref. <span id="dsr-ref-days" class="font-mono">8</span> dias</p>
         </div>
       </div>
@@ -685,7 +685,7 @@ const { hideTitle = false } = Astro.props;
 
   // ── Helpers ──
   const $ = (id: string) => document.getElementById(id)!;
-  const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 }).format(n);
+  const fmt = (n: number) => 'R$ ' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // ── State ──
   const dayNames = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
@@ -1228,7 +1228,7 @@ const { hideTitle = false } = Astro.props;
 
     const grossTotal = dSP + dOP + dsrValue;
     const now = new Date();
-    const dateStr = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const dateStr = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
 
     let ruleDesc = '';
     if (multiplier === 1.5) ruleDesc = 'CLT Art. 59 – Hora Extra 50%';
