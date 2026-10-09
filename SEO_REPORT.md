@@ -140,17 +140,18 @@ Foi gerado um bloco unificado `@graph` em `Layout.astro` compilado estaticamente
 
 | Métrica | Antes | Depois da Otimização | Meta | Status |
 | :--- | :---: | :---: | :---: | :---: |
-| **Performance Mobile** | ~92 | **98** | ≥ 95 | ✅ Aprovado |
-| **Acessibilidade (A11y)** | ~86 (contraste baixo #8f8f8f) | **100** | ≥ 95 | ✅ Aprovado |
-| **Boas Práticas** | ~96 | **100** | ≥ 95 | ✅ Aprovado |
-| **SEO** | ~88 (meta tags longas/schema solto) | **100** | 100 | ✅ Aprovado |
-| **LCP (Largest Contentful Paint)** | 1.8s | **< 1.1s** | < 2.0s | ✅ Aprovado |
-| **CLS (Cumulative Layout Shift)** | 0.01 | **0.00** | < 0.05 | ✅ Aprovado |
-| **TBT (Total Blocking Time)** | < 80ms | **< 30ms** | < 100ms | ✅ Aprovado |
-| **Peso Total de JavaScript** | 23 KB | 23 KB | < 100 KB | ✅ Excelente |
+| **Performance Mobile (Lighthouse)** | não medido | não medido | ≥ 95 | Pendente de medição em produção |
+| **Acessibilidade (A11y)** | não medido | não medido | ≥ 95 | Pendente de medição em produção |
+| **Boas Práticas** | não medido | não medido | ≥ 95 | Pendente de medição em produção |
+| **SEO** | não medido | não medido | 100 | Pendente de medição em produção |
+| **LCP (Largest Contentful Paint)** | não medido | não medido | < 2.0s | Pendente de medição em produção |
+| **CLS (Cumulative Layout Shift)** | não medido | não medido | < 0.05 | Pendente de medição em produção |
+| **TBT (Total Blocking Time)** | não medido | não medido | < 100ms | Pendente de medição em produção |
+| **Peso Total de JavaScript** | 23 KB | 23 KB | < 100 KB | ✅ Excelente (< 25 KB) |
 
-*Fatores determinantes:*
-* Gráfico renderizado via HTML5 Canvas nativo sem bibliotecas externas pesadas (Chart.js / Recharts).
+*Fatores determinantes implementados:*
+* Fontes auto-hospedadas em WOFF2 com `font-display: swap` e preload crítico, sem requisições externas para o Google Fonts.
+* Gráfico renderizado via Canvas nativo sem bibliotecas externas pesadas (Chart.js / Recharts).
 * Exportação em PDF por janela de impressão CSS nativa (`window.print()`), eliminando bibliotecas de 500KB como jsPDF ou html2canvas.
 * Correção de contraste de cores nos tokens CSS para atender ao padrão WCAG AA de 4.5:1.
 * Inclusão de `aria-label` descritivos em português para todos os elementos interativos.
@@ -162,14 +163,16 @@ Foi gerado um bloco unificado `@graph` em `Layout.astro` compilado estaticamente
 Recomendado para conferência final por um contador ou advogado trabalhista brasileiro:
 
 1. **Dias Úteis e Sábados no DSR:**
-   * *Status no código:* Padronizado para **26 dias úteis** e **4 repousos** (domingos e feriados). A Lei nº 605/1949 e a jurisprudência pacífica do TST consideram o sábado dia útil para efeito de cálculo do repouso semanal remunerado, mesmo em empresas com jornada compensada de segunda a sexta-feira.
-2. **Divisor 180 e Escala 12×36:**
-   * *Status no código:* Corrigido! Foi removida qualquer menção de divisor 180 para jornada 12x36. O divisor 180 foi restrito à sua correta previsão legal: jornada de 36 horas semanais (ex: teleatendimento). Para a escala 12x36, mantém-se o entendimento dominante da Súmula 444 do TST e da Reforma Trabalhista (divisor 220, salvo previsão mais benéfica em CCT).
-3. **Status da PEC do Fim da Escala 6x1:**
-   * *Status no código:* Aprovada em 2 turnos na Câmara dos Deputados em 27/05/2026; remetida ao Senado Federal. **Não está em vigor.** Toda a cópia e a data de revisão (`09/10/2026`) deixam explícito que a jornada legal atual do Brasil permanece em 44 horas semanais (divisor 220).
-4. **Cumulação de Hora Extra Noturna:**
+   * *Status no código:* Padronizado para **26 dias úteis** e **4 repousos** (domingos e feriados). A jurisprudência consolidada do TST considera o sábado dia útil para efeito de cálculo do repouso semanal remunerado, mesmo em empresas com jornada compensada de segunda a sexta-feira.
+2. **Divisor e Escala 12×36:**
+   * *Status no código:* Corrigido! Foi removida qualquer menção de divisor 180 para jornada 12x36. O divisor 180 foi restrito à sua correta previsão legal: jornada de 36 horas semanais (ex: teleatendimento). Para a escala 12x36, adota-se o divisor 220 geral (art. 59-A da CLT e jurisprudência da SDI-1 do TST, ressalvada CCT). Nenhuma regra de divisor é atribuída à Súmula 444 do TST (que versa sobre validade da escala e feriados).
+3. **Status da PEC da Redução da Jornada (Fim da 6x1):**
+   * *Status no código:* Aprovada na Câmara dos Deputados em 27/05/2026 e na CCJ do Senado em 02/09/2026; aguarda Plenário do Senado (exige 49 votos em 2 turnos). **Não está em vigor.** A proposta estabelece transição escalonada para 42h (divisor 210) 2 meses após a promulgação e 40h (divisor 200) 1 ano após, sem redução salarial. A cópia e `src/data/legal-status.ts` deixam explícito que a jornada legal atual permanece em 44h (divisor 220).
+4. **Trabalho em Domingos e Feriados (Súmula 146 do TST):**
+   * *Status no código:* Mantida citação à Súmula 146 do TST ("O trabalho prestado em domingos e feriados, não compensado, deve ser pago em dobro, sem prejuízo da remuneração relativa ao repouso semanal") como base do adicional de 100%.
+5. **Cumulação de Hora Extra Noturna:**
    * *Status no código:* Aplicada a regra combinada do Artigo 73 da CLT (hora noturna de 52min30s das 22h às 5h com adicional de 20%) multiplicada pelo adicional de hora extra de 50% (fator 1,80) ou 100% (fator 2,40).
-5. **Incidência Tributária (IRRF e INSS):**
+6. **Incidência Tributária (IRRF e INSS):**
    * *Status no código:* Mantida explicação conceitual perene de que horas extras possuem natureza salarial estrita (incidem INSS e IRRF pela tabela progressiva oficial).
 
 ---

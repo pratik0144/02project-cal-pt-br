@@ -7,18 +7,19 @@
 export interface LegalStatusData {
   lastReviewed: string; // ISO 8601 (YYYY-MM-DD)
   lastReviewedFormatted: string; // pt-BR (DD/MM/AAAA)
+  reviewedBy: { name: string; credential: string } | null;
   year: number;
   pec6x1: {
     title: string;
     statusSummary: string;
     statusDetail: string;
     inForce: boolean;
-    camaraApprovalDate: string; // pt-BR
-    currentChamber: string;
-    proposedHours: number;
-    proposedDivisor: number;
-    standardHours: number;
-    standardDivisor: number;
+    transitionHours: number; // 42h
+    transitionDivisor: number; // 210
+    proposedHours: number; // 40h
+    proposedDivisor: number; // 200
+    standardHours: number; // 44h
+    standardDivisor: number; // 220
   };
   cltRules: {
     maxDailyOvertime: number; // 2 horas (Art. 59 CLT)
@@ -37,14 +38,15 @@ export interface LegalStatusData {
 export const legalStatus: LegalStatusData = {
   lastReviewed: "2026-10-09",
   lastReviewedFormatted: "09/10/2026",
+  reviewedBy: null,
   year: 2026,
   pec6x1: {
-    title: "Proposta de Emenda à Constituição (PEC) do Fim da Escala 6x1",
-    statusSummary: "Aprovada na Câmara dos Deputados em 27/05/2026; em tramitação no Senado Federal. Não está em vigor.",
-    statusDetail: "A PEC propõe a redução gradual da jornada padrão semanal de 44 horas para 40 horas e a instituição da escala 5x2. Até a promulgação de emenda constitucional definitiva após votação em 2 turnos no Senado, a jornada legal vigente permanece em 44h semanais (divisor 220).",
+    title: "Propostas de Redução da Jornada de Trabalho (Escalas 40h e 42h)",
+    statusSummary: "Propostas legislativas de redução da jornada semanal em debate no Congresso Nacional. Não estão em vigor.",
+    statusDetail: "A legislação trabalhista brasileira em vigor estabelece a jornada padrão de 44 horas semanais e 8 horas diárias (Artigo 7º, XIII da CF/88 e Artigo 58 da CLT), com divisor 220. Propostas que debatem a transição para 42h ou 40h permanecem em tramitação e não produzem efeitos jurídicos imediatos. Nossa calculadora permite simular essas jornadas para quem já possui acordos coletivos específicos ou deseja planejar cenários.",
     inForce: false,
-    camaraApprovalDate: "27/05/2026",
-    currentChamber: "Senado Federal",
+    transitionHours: 42,
+    transitionDivisor: 210,
     proposedHours: 40,
     proposedDivisor: 200,
     standardHours: 44,
@@ -59,34 +61,24 @@ export const legalStatus: LegalStatusData = {
   },
   sources: [
     {
-      name: "Decreto-Lei nº 5.452/1943 (CLT - Art. 59 e Art. 73)",
+      name: "CLT (Decreto-Lei nº 5.452/1943 - Art. 59 e 73)",
       url: "https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm",
-      description: "Consolidação das Leis do Trabalho: limites diários de jornada suplementar e adicional noturno."
+      description: "Limites de prorrogação diária e adicionais de hora extra e noturno."
     },
     {
-      name: "Constituição da República Federativa do Brasil de 1988 (Art. 7º, XVI)",
+      name: "Constituição Federal de 1988 (Art. 7º, XIII e XVI)",
       url: "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm",
-      description: "Remuneração do serviço extraordinário superior, no mínimo, em 50% à do normal."
+      description: "Jornada máxima de 8h/44h e adicional extraordinário de no mínimo 50%."
     },
     {
-      name: "Lei nº 605/1949 (Repouso Semanal Remunerado)",
+      name: "Lei nº 605/1949 (DSR e Feriados)",
       url: "https://www.planalto.gov.br/ccivil_03/leis/l0605.htm",
-      description: "Regulamentação do Descanso Semanal Remunerado (DSR) e pagamento de feriados civis e religiosos."
+      description: "Descanso semanal remunerado e trabalho em feriados civis e religiosos."
     },
     {
-      name: "Lei nº 13.467/2017 (Reforma Trabalhista - Banco de Horas)",
-      url: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/lei/l13467.htm",
-      description: "Compensação de jornada e pactuação individual de banco de horas semestral."
-    },
-    {
-      name: "Súmula nº 172 do TST (Reflexo de Horas Extras no DSR)",
+      name: "Súmulas 146, 172 e 264 do TST",
       url: "https://www.tst.jus.br/sumulas",
-      description: "Computam-se no cálculo do repouso remunerado as horas extras habitualmente prestadas."
-    },
-    {
-      name: "Súmula nº 264 do TST (Base de Cálculo da Hora Extra)",
-      url: "https://www.tst.jus.br/sumulas",
-      description: "Integração de parcelas salariais fixas e adicionais na base de cálculo da hora extra."
+      description: "Reflexos de horas extras no DSR, trabalho em domingos e base salarial."
     }
   ]
 };

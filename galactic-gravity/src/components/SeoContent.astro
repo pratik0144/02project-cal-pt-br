@@ -1,8 +1,8 @@
 ---
 /**
- * SeoContent.astro - Guia Técnico e Completo de Horas Extras no Brasil (CLT)
+ * SeoContent.astro - Guia Técnico e Prático de Horas Extras no Brasil (CLT)
  * Otimizado para SEO, snippet-ready, vocabulário contábil/trabalhista nativo pt-BR.
- * Contagem alvo: 1.800 a 2.500 palavras.
+ * Contagem estrita: sob 1.500 palavras (máximo 1.600 palavras).
  */
 import { legalStatus } from '../data/legal-status';
 ---
@@ -15,7 +15,7 @@ import { legalStatus } from '../data/legal-status';
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full" style="background-color: var(--color-g-link);"></span>
         <span class="text-xs font-mono font-medium" style="color: var(--color-g-body);">
-          Revisão Editorial CLT: <strong>{legalStatus.lastReviewedFormatted}</strong>
+          Conteúdo atualizado em <strong>{legalStatus.lastReviewedFormatted}</strong>
         </span>
       </div>
       <a href="#calculadora" class="text-xs font-mono font-semibold hover:underline" style="color: var(--color-g-link);">
@@ -26,45 +26,37 @@ import { legalStatus } from '../data/legal-status';
     <!-- SEÇÃO 1: Como calcular horas extras (passo a passo) -->
     <section id="como-calcular-horas-extras" aria-labelledby="h2-como-calcular">
       <h2 id="h2-como-calcular" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
-        Como calcular horas extras (passo a passo)
+        Como calcular horas extras: passo a passo com exemplos
       </h2>
-      <!-- 40-60 word direct answer for snippet -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        Para calcular horas extras, divida seu salário bruto mensal pelo divisor da jornada (220 para 44h semanais) para apurar o valor da hora normal. Em seguida, multiplique o valor da hora pelo fator do adicional (1,5 para 50% ou 2,0 para 100%) e multiplique o resultado pela quantidade de horas extraordinárias executadas.
+        Para <strong>calcular horas extras</strong>, divida seu salário bruto pelo divisor da jornada (220 para 44 horas semanais) para apurar o valor da hora normal. Em seguida, multiplique pelo adicional devido (1,5 para 50% ou 2,0 para 100%) e pela quantidade de horas suplementares realizadas.
       </p>
       <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        O <strong>cálculo de hora extra</strong> no Brasil é regulamentado pela Consolidação das Leis do Trabalho (CLT) e pelo Artigo 7º, inciso XVI da Constituição Federal de 1988. Qualquer período trabalhado que ultrapasse o limite diário contratual (normalmente 8 horas) ou semanal (habitualmente 44 horas) deve ser remunerado com acréscimo financeiro obrigatório.
-      </p>
-      <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        O primeiro elemento fundamental é identificar o divisor salarial exato da sua escala de trabalho contratada:
+        O <strong>cálculo de hora extra</strong> (ou <strong>calculo de hora extra</strong>) no Brasil é regulamentado pela CLT e pelo Artigo 7º, inciso XVI da Constituição Federal. Toda atividade que ultrapasse a jornada regular contratual deve ser remunerada com acréscimo obrigatório. Para <strong>calcular hora extra</strong> com exatidão, identifique o divisor salarial da sua escala:
       </p>
       <div class="p-4 rounded-lg mb-5" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
         <p class="mono-eyebrow mb-2">DIVISORES SALARIAIS OFICIAIS PELA JORNADA SEMANAL</p>
         <ul class="space-y-1.5 text-xs sm:text-sm font-mono" style="color: var(--color-g-ink);">
-          <li>• <strong>44 horas semanais:</strong> Divisor <strong>220</strong> (Salário Bruto ÷ 220 = Valor da Hora Normal)</li>
-          <li>• <strong>40 horas semanais:</strong> Divisor <strong>200</strong> (Salário Bruto ÷ 200 = Valor da Hora Normal)</li>
-          <li>• <strong>36 horas semanais:</strong> Divisor <strong>180</strong> (Salário Bruto ÷ 180 = Valor da Hora Normal)</li>
-          <li>• <strong>30 horas semanais:</strong> Divisor <strong>150</strong> (Salário Bruto ÷ 150 = Valor da Hora Normal)</li>
+          <li>• <strong>44 horas semanais:</strong> Divisor <strong>220</strong> (Salário Bruto ÷ 220)</li>
+          <li>• <strong>40 horas semanais:</strong> Divisor <strong>200</strong> (Salário Bruto ÷ 200)</li>
+          <li>• <strong>36 horas semanais:</strong> Divisor <strong>180</strong> (Salário Bruto ÷ 180)</li>
+          <li>• <strong>30 horas semanais:</strong> Divisor <strong>150</strong> (Salário Bruto ÷ 150)</li>
         </ul>
       </div>
 
-      <!-- Exemplo Matemático Prático -->
       <div class="p-5 rounded-xl mb-4" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline);">
         <h3 class="text-sm sm:text-base font-semibold mb-2" style="color: var(--color-g-ink);">
-          Exemplo Prático Demonstrado (Passo a Passo)
+          Exemplo Prático de Apuração
         </h3>
         <p class="text-xs sm:text-sm leading-relaxed mb-2" style="color: var(--color-g-body);">
-          Considere um trabalhador com salário mensal registrado de <strong>R$ 2.200,00</strong> sob jornada padrão de <strong>44 horas semanais</strong>:
+          Trabalhador com salário de <strong>R$ 2.200,00</strong> na jornada de <strong>44 horas semanais</strong>:
         </p>
-        <ol class="list-decimal pl-5 space-y-1.5 text-xs sm:text-sm" style="color: var(--color-g-body);">
-          <li><strong>Apurar a hora normal:</strong> R$ 2.200,00 ÷ 220 = <strong>R$ 10,00 por hora</strong>.</li>
-          <li><strong>Calcular 10 horas extras a 50%:</strong> R$ 10,00 × 1,50 × 10h = <strong>R$ 150,00</strong>.</li>
-          <li><strong>Calcular 10 horas extras a 100%:</strong> R$ 10,00 × 2,00 × 10h = <strong>R$ 200,00</strong>.</li>
+        <ol class="list-decimal pl-5 space-y-1 text-xs sm:text-sm" style="color: var(--color-g-body);">
+          <li><strong>Hora normal:</strong> R$ 2.200,00 ÷ 220 = <strong>R$ 10,00 por hora</strong>.</li>
+          <li><strong>10 horas extras a 50%:</strong> R$ 10,00 × 1,50 × 10h = <strong>R$ 150,00</strong>.</li>
+          <li><strong>10 horas extras a 100%:</strong> R$ 10,00 × 2,00 × 10h = <strong>R$ 200,00</strong>.</li>
         </ol>
       </div>
-      <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
-        Ao <strong>calcular horas extras</strong>, nunca se esqueça de que o valor apurado não termina aí: o trabalhador tem direito ao reflexo financeiro do repouso semanal remunerado (DSR), detalhado a seguir.
-      </p>
     </section>
 
     <!-- SEÇÃO 2: Como calcular horas extras 50% -->
@@ -72,21 +64,17 @@ import { legalStatus } from '../data/legal-status';
       <h2 id="h2-he-50" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
         Como calcular horas extras 50%
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        Para calcular horas extras com adicional de 50%, multiplique o valor da sua hora normal de trabalho pelo fator 1,5 e depois pela quantidade de horas extras trabalhadas. O adicional de 50% é a porcentagem mínima obrigatória por lei para serviços prestados em dias úteis, incluindo sábados comuns.
+        Para calcular horas extras a 50%, multiplique o valor da sua hora normal por 1,5 e pela quantidade de horas suplementares prestadas. O adicional de 50% é o mínimo obrigatório por lei para sobrejornadas em dias úteis, de segunda-feira a sábado.
       </p>
       <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        O adicional de 50% está previsto no Artigo 7º, inciso XVI da Constituição Federal e no Artigo 59 da CLT. Ele remunera o esforço do colaborador que estendeu a sua permanência na empresa além do expediente regular em dias comuns da semana (de segunda a sexta-feira) ou no sábado (caso este faça parte da escala ou configure hora extra de compensação).
-      </p>
-      <p class="text-sm sm:text-base leading-relaxed mb-3" style="color: var(--color-g-body);">
-        <strong>Fórmula de Cálculo:</strong>
+        Previsto no Artigo 7º, XVI da CF/88 e no Artigo 59 da CLT, o adicional remunera o tempo excedente à jornada regular.
       </p>
       <div class="p-3.5 rounded-lg font-mono text-xs sm:text-sm mb-4" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
         Valor da HE 50% = (Salário Base ÷ Divisor) × 1,50 × Horas Realizadas
       </div>
       <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
-        <strong>Exemplo prático em dia útil:</strong> Se um empregado recebe R$ 3.300,00 mensais na jornada de 44 horas (divisor 220), o valor da sua hora normal é de R$ 15,00. Cada hora extra prestada com acréscimo de 50% valerá <strong>R$ 22,50</strong> (R$ 15,00 × 1,5). Ao totalizar 12 horas suplementares no mês, o colaborador acumulará R$ 270,00 brutos de horas extras a 50%, além da parcela proporcional do DSR.
+        <strong>Exemplo:</strong> Com salário de R$ 3.300,00 na jornada de 44h (divisor 220), a hora normal custa R$ 15,00. A hora extra a 50% vale <strong>R$ 22,50</strong> (R$ 15,00 × 1,5). Cumprir 12 horas suplementares no mês gera R$ 270,00 brutos, além do DSR.
       </p>
     </section>
 
@@ -95,44 +83,39 @@ import { legalStatus } from '../data/legal-status';
       <h2 id="h2-he-100" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
         Como calcular horas extras 100%
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        Para calcular horas extras a 100%, multiplique o valor da sua hora normal por 2,0 e em seguida pela quantidade de horas realizadas no dia. O acréscimo de 100% é obrigatório por lei para todo trabalho executado aos domingos e feriados quando o empregador não conceder folga compensatória posterior.
+        Para calcular horas extras a 100%, multiplique o valor da hora normal por 2,0 e pela quantidade de horas trabalhadas no dia. O acréscimo de 100% incide sobre o trabalho aos domingos e feriados quando não houver concessão de folga compensatória.
       </p>
       <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        A base legal da hora extra em dobro é estabelecida pela Lei nº 605/1949 e pela Súmula 146 do Tribunal Superior do Trabalho (TST). O ordenamento jurídico protege o repouso semanal remunerado por razões biológicas, sociais e de convívio familiar. Logo, quando o trabalhador abre mão do repouso em feriados nacionais, estaduais ou domingos sem folga compensatória, a empresa deve pagar o dia em dobro.
+        A hora extra em dobro tem base na Lei nº 605/1949 e na Súmula nº 146 do TST. O repouso aos domingos resguarda a saúde do trabalhador; sua supressão sem compensação exige remuneração duplicada.
       </p>
       <div class="p-3.5 rounded-lg font-mono text-xs sm:text-sm mb-4" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
         Valor da HE 100% = (Salário Base ÷ Divisor) × 2,00 × Horas Realizadas
       </div>
-      <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        <strong>Exemplo prático em feriado:</strong> Se a hora normal for R$ 20,00, a hora extra a 100% equivalerá a <strong>R$ 40,00</strong>. Trabalhar 8 horas durante um feriado sem folga compensatória gerará um pagamento suplementar de R$ 320,00 (8 × R$ 40,00).
-      </p>
       <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
-        <em>Atenção a Convenções Coletivas (CCT):</em> Diversos sindicatos e acordos coletivos estipulam adicionais superiores ao mínimo constitucional, como 60%, 70%, 80% ou até 120%. Em nossa calculadora, você pode ajustar livremente o campo do multiplicador para refletir a convenção da sua categoria profissional.
+        <strong>Exemplo:</strong> Para hora normal de R$ 20,00, a hora a 100% vale <strong>R$ 40,00</strong>. Trabalhar 8 horas em feriado confere R$ 320,00 brutos. Convenções coletivas podem fixar adicionais superiores (como 60% ou 70%), ajustáveis livremente em nossa calculadora.
       </p>
     </section>
 
     <!-- SEÇÃO 4: Como calcular as horas extras trabalhadas -->
     <section id="como-calcular-horas-extras-trabalhadas" aria-labelledby="h2-he-trabalhadas">
       <h2 id="h2-he-trabalhadas" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
-        Como calcular as horas extras trabalhadas
+        Como calcular as horas extras trabalhadas no espelho de ponto
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        Para calcular as horas extras trabalhadas a partir do espelho de ponto, totalize o tempo diário de serviço, desconte os intervalos para descanso e converta os minutos em horas decimais dividindo por 60. Subtraia a jornada contratual pactuada para encontrar as horas suplementares líquidas sujeitas ao adicional.
+        Para <strong>calcular as horas extras trabalhadas</strong> a partir do espelho de ponto, totalize as horas diárias, desconte os intervalos de almoço e converta os minutos em base decimal dividindo por 60. Subtraia a jornada contratual para obter as horas extras líquidas devidas.
       </p>
       <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        A apuração prática do cartão ou espelho de ponto exige atenção contábil à conversão do sistema sexagesimal (horas e minutos) para o sistema decimal (usado nos cálculos financeiros de folha de pagamento). Um erro frequente de trabalhadores é somar minutos como se fossem centésimos (por exemplo, achar que 1h30min é 1,30 horas, quando na realidade corresponde a 1,50 horas).
+        Entender <strong>como calcular horas extras trabalhadas</strong> exige atenção à conversão de minutos: 30 minutos equivalem a 0,50h (30 ÷ 60), e não a 0,30h.
       </p>
       <div class="overflow-x-auto mb-5">
         <table class="w-full text-xs sm:text-sm border-collapse" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline); border-radius: 8px;">
           <thead>
             <tr style="border-bottom: 2px solid var(--color-g-hairline); background: var(--color-g-canvas);">
               <th class="p-2.5 text-left font-mono">Minutos Relógio</th>
-              <th class="p-2.5 text-center font-mono">Operação</th>
+              <th class="p-2.5 text-center font-mono">Cálculo</th>
               <th class="p-2.5 text-right font-mono">Fração Decimal</th>
-              <th class="p-2.5 text-left">Exemplo Prático</th>
+              <th class="p-2.5 text-left">Aplicação Comum</th>
             </tr>
           </thead>
           <tbody class="divide-y" style="border-color: var(--color-g-hairline);">
@@ -140,7 +123,7 @@ import { legalStatus } from '../data/legal-status';
               <td class="p-2.5 font-mono font-semibold">15 minutos</td>
               <td class="p-2.5 text-center font-mono">15 ÷ 60</td>
               <td class="p-2.5 text-right font-mono font-semibold">0,25 h</td>
-              <td class="p-2.5" style="color: var(--color-g-body);">Pequeno atraso na saída</td>
+              <td class="p-2.5" style="color: var(--color-g-body);">Atraso pontual na saída</td>
             </tr>
             <tr>
               <td class="p-2.5 font-mono font-semibold">30 minutos</td>
@@ -152,20 +135,17 @@ import { legalStatus } from '../data/legal-status';
               <td class="p-2.5 font-mono font-semibold">45 minutos</td>
               <td class="p-2.5 text-center font-mono">45 ÷ 60</td>
               <td class="p-2.5 text-right font-mono font-semibold">0,75 h</td>
-              <td class="p-2.5" style="color: var(--color-g-body);">Extensão de turno</td>
+              <td class="p-2.5" style="color: var(--color-g-body);">Prorrogação de turno</td>
             </tr>
             <tr>
               <td class="p-2.5 font-mono font-semibold">48 minutos</td>
               <td class="p-2.5 text-center font-mono">48 ÷ 60</td>
               <td class="p-2.5 text-right font-mono font-semibold">0,80 h</td>
-              <td class="p-2.5" style="color: var(--color-g-body);">Compensação de sábado (8h48/dia)</td>
+              <td class="p-2.5" style="color: var(--color-g-body);">Compensação de sábado (8h48 = 44h)</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
-        Saber <strong>como calcular horas extras trabalhadas</strong> com precisão evita que minutos legítimos de trabalho sejam descartados na apuração do seu holerite mensal.
-      </p>
     </section>
 
     <!-- SEÇÃO 5: Calculadora de horas extras com minutos -->
@@ -173,157 +153,106 @@ import { legalStatus } from '../data/legal-status';
       <h2 id="h2-com-minutos" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
         Calculadora de horas extras com minutos
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        Nossa calculadora de horas extras com minutos possui campos dedicados para horas (0 a 24) e minutos (0 a 59) em cada dia da semana. Isso permite lançar jornadas fracionadas reais, como 8h48min na escala de 44h compensada ou frações exatas de 15, 30 e 45 minutos suplementares.
+        Nossa <strong>calculadora de horas extras com minutos</strong> possui campos dedicados para horas (0 a 24) e minutos (0 a 59) em cada dia da semana. Isso permite lançar escalas compensadas de 8h48 ou frações exatas de 15 a 59 minutos sem distorções de arredondamento.
       </p>
       <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        Grande parte das ferramentas disponíveis na internet obriga o trabalhador a arredondar suas horas para números inteiros ou a realizar a conversão decimal manualmente em um rascunho separado. Essa limitação gera inconsistências graves no cálculo final do contracheque.
-      </p>
-      <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        Ao utilizar nossa <strong>calculadora de horas extras com minutos</strong>, o motor de cálculo converte internamente cada fração diária para notação precisa em tempo real. Se você digitar <code>8 horas</code> e <code>48 minutos</code> de segunda a sexta-feira, o algoritmo apura perfeitamente as 44 horas normais da semana (5 dias × 8,8 horas = 44,0h), apontando como hora extra estritamente aquilo que ultrapassar essa tolerância.
+        O sistema converte instantaneamente cada fração de tempo em valor decimal. Ao informar 8 horas e 48 minutos de segunda a sexta-feira, o algoritmo apura as 44 horas ordinárias semanais (5 dias × 8,8h = 44h), aplicando o adicional exclusivamente ao excedente.
       </p>
       <div class="p-4 rounded-xl flex items-center justify-between flex-wrap gap-3" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline);">
         <div>
-          <p class="text-sm font-semibold" style="color: var(--color-g-ink);">Quer testar com seus minutos de ponto?</p>
-          <p class="text-xs" style="color: var(--color-g-body);">Suba até a grade de horários e digite seus minutos em cada dia da semana.</p>
+          <p class="text-sm font-semibold" style="color: var(--color-g-ink);">Deseja lançar minutos fracionados?</p>
+          <p class="text-xs" style="color: var(--color-g-body);">Preencha seus horários na grade acima e confira o valor calculado em tempo real.</p>
         </div>
         <a href="#calculadora" class="px-4 py-2 rounded-lg text-xs font-semibold font-mono" style="background: var(--color-g-ink); color: var(--color-g-on-primary);">
-          Testar Minutos Agora &rarr;
+          Testar Horas e Minutos &rarr;
         </a>
       </div>
     </section>
 
-    <!-- SEÇÃO 6: DSR sobre horas extras: fórmula e exemplo -->
+    <!-- SEÇÃO 6: DSR sobre horas extras -->
     <section id="dsr-sobre-horas-extras" aria-labelledby="h2-dsr-formula">
       <h2 id="h2-dsr-formula" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
-        DSR sobre horas extras: fórmula e exemplo
+        DSR sobre horas extras: fórmula e exemplo prático
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        O DSR sobre horas extras é calculado pela fórmula oficial: (Valor total das horas extras ÷ Dias úteis do mês) × Domingos e feriados. Pela Lei nº 605/1949, os sábados são legalmente computados como dias úteis, resultando no padrão contábil mensal típico de 26 dias úteis e 4 repousos remunerados.
+        O DSR sobre horas extras é apurado pela fórmula: (Valor total das horas extras ÷ Dias úteis do mês) × Domingos e feriados. Pela jurisprudência pacificada do TST (Súmula 172), os sábados contam como dias úteis para esse cálculo, compondo o padrão usual de 26 dias úteis e 4 repousos no mês comercial.
       </p>
       <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        O Descanso Semanal Remunerado (DSR) tem fundamentação jurídica na Lei nº 605/1949 e na Súmula nº 172 do Tribunal Superior do Trabalho (TST), que determina de forma expressa: <em>"Computam-se no cálculo do repouso remunerado as horas extras habitualmente prestadas"</em>.
+        O repouso remunerado encontra respaldo na Lei nº 605/1949 e na Súmula nº 172 do TST: <em>"Computam-se no cálculo do repouso remunerado as horas extras habitualmente prestadas"</em>.
       </p>
       <div class="p-4 rounded-lg font-mono text-xs sm:text-sm mb-4" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
         DSR = (Total em R$ de Horas Extras ÷ Dias Úteis) × (Domingos + Feriados)
       </div>
 
-      <!-- Continuação do Exemplo de 50% -->
       <div class="p-5 rounded-xl mb-4" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline);">
         <h3 class="text-sm sm:text-base font-semibold mb-2" style="color: var(--color-g-ink);">
-          Continuação do Exemplo Numérico de 50% com DSR
+          Exemplo Numérico de Horas Extras com DSR
         </h3>
         <p class="text-xs sm:text-sm leading-relaxed mb-2" style="color: var(--color-g-body);">
-          Retomando o nosso exemplo do trabalhador com salário de R$ 2.200,00 que acumulou <strong>R$ 150,00 em 10 horas extras a 50%</strong> no mês:
+          Para 10 horas extras a 50% somando <strong>R$ 150,00</strong> em um mês padrão (26 dias úteis e 4 repousos):
         </p>
         <ul class="space-y-1.5 text-xs sm:text-sm" style="color: var(--color-g-body);">
-          <li>• <strong>Dias úteis no mês (segunda a sábado):</strong> 26 dias</li>
-          <li>• <strong>Domingos e feriados do mês:</strong> 4 dias</li>
           <li>• <strong>Cálculo do DSR:</strong> (R$ 150,00 ÷ 26) × 4 = <strong>R$ 23,08</strong></li>
-          <li>• <strong>Remuneração bruta total extraordinária:</strong> R$ 150,00 + R$ 23,08 = <strong>R$ 173,08</strong></li>
+          <li>• <strong>Total bruto com DSR:</strong> R$ 150,00 + R$ 23,08 = <strong>R$ 173,08</strong></li>
         </ul>
       </div>
       <p class="text-sm sm:text-base leading-relaxed" style="color: var(--color-g-body);">
-        Nossa <strong>calculadora de horas extras e DSR</strong> realiza essa apuração instantaneamente ao marcar o seletor "DSR sobre HE", aplicando os dias úteis e repousos exatos do seu mês de apuração.
+        Nossa <strong>calculadora de horas extras e dsr</strong> integra essa apuração de maneira automática, com parâmetros editáveis de dias úteis e repousos para se adequar a qualquer mês.
       </p>
     </section>
 
     <!-- SEÇÃO 7: Regras da CLT para horas extras -->
     <section id="regras-da-clt-horas-extras" aria-labelledby="h2-regras-clt">
       <h2 id="h2-regras-clt" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
-        Regras da CLT para horas extras (limites e adicionais)
+        Regras da CLT para horas extras: limites e direitos
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        A legislação trabalhista brasileira fixa limite máximo de 2 horas extras por dia (Artigo 59 da CLT) e adicional remuneratório mínimo de 50% (Constituição Federal, Artigo 7º, XVI). A prorrogação exige acordo individual escrito ou convenção coletiva, podendo ser compensada via banco de horas formal.
-      </p>
-      <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        Para assegurar o cumprimento rigoroso dos seus direitos, conheça os quatro pilares da CLT relativos à jornada extraordinária:
+        A CLT fixa o limite máximo de 2 horas extras por dia (Artigo 59) e adicional de no mínimo 50% (Constituição Federal, Artigo 7º, XVI). A prorrogação requer acordo escrito ou norma coletiva, admitindo compensação por banco de horas.
       </p>
       <div class="space-y-3 mb-5">
         <div class="p-4 rounded-lg" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
           <h3 class="text-sm font-semibold mb-1" style="color: var(--color-g-ink);">1. Limite Diário de 2 Horas (Art. 59 da CLT)</h3>
           <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
-            A jornada regular de 8 horas diárias só pode ser estendida em até 2 horas por dia, totalizando no máximo 10 horas de trabalho diário. Exceções a esse teto são restritas a casos extraordinários de força maior ou para conclusão de serviços inadiáveis (Art. 61 da CLT).
+            A jornada pode ser prorrogada em até 2 horas diárias (máximo de 10 horas de trabalho no dia). Exceções ocorrem apenas por força maior ou serviços inadiáveis (Art. 61).
           </p>
         </div>
         <div class="p-4 rounded-lg" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
-          <h3 class="text-sm font-semibold mb-1" style="color: var(--color-g-ink);">2. Adicional Mínimo Constitucional (CF/88 Art. 7º, XVI)</h3>
+          <h3 class="text-sm font-semibold mb-1" style="color: var(--color-g-ink);">2. Banco de Horas e Compensação (Lei nº 13.467/2017)</h3>
           <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
-            A Constituição Federal assegura que toda hora suplementar seja remunerada com adicional nunca inferior a 50% sobre o valor da hora normal.
+            Permite trocar sobrejornada por folgas em até 6 meses (acordo individual) ou 1 ano (negociação coletiva). Horas não compensadas devem ser pagas com adicional.
           </p>
         </div>
         <div class="p-4 rounded-lg" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
-          <h3 class="text-sm font-semibold mb-1" style="color: var(--color-g-ink);">3. Banco de Horas e Compensação (Lei nº 13.467/2017)</h3>
+          <h3 class="text-sm font-semibold mb-1" style="color: var(--color-g-ink);">3. Hora Extra Noturna (Art. 73 da CLT)</h3>
           <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
-            A Reforma Trabalhista autorizou a celebração de banco de horas por acordo individual escrito para compensação no período máximo de 6 meses. Se pactuado por convenção coletiva sindical, o prazo de compensação pode atingir até 1 ano. Caso as folgas não ocorram no prazo legal, as horas devem ser quitadas em dinheiro com o adicional legal.
+            Trabalho entre 22h e 5h tem hora noturna de 52min30s e adicional de 20%. Horas extras no período noturno acumulam ambos os adicionais (fator 1,80 a 50% ou 2,40 a 100%).
           </p>
         </div>
         <div class="p-4 rounded-lg" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
-          <h3 class="text-sm font-semibold mb-1" style="color: var(--color-g-ink);">4. Hora Extra Noturna e Cumulação (Art. 73 da CLT)</h3>
+          <h3 class="text-sm font-semibold mb-1" style="color: var(--color-g-ink);">4. Jornada Padrão e Simulação de Escalas</h3>
           <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
-            O trabalho prestado entre as 22h e as 5h possui hora noturna ficta reduzida (52 minutos e 30 segundos) e adicional noturno de 20%. Quando o funcionário faz hora extra nesse período, os adicionais se acumulam, elevando o valor da hora suplementar.
+            A duração normal de trabalho no Brasil é de 44h semanais e 8h diárias (CLT Art. 58 e CF/88 Art. 7º, XIII), aplicando-se o divisor 220. Propostas parlamentares de redução para 40h seguem em tramitação e não estão em vigor. Na nossa ferramenta, é possível simular divisores como 200 (40h) e 210 (42h) para categorias com acordos coletivos específicos.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- SEÇÃO 8: Jornada de 40h e a PEC do fim da escala 6x1 -->
-    <section id="pec-do-fim-da-escala-6x1" aria-labelledby="h2-pec-6x1">
-      <h2 id="h2-pec-6x1" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
-        Jornada de 40h e a PEC do fim da escala 6x1
-      </h2>
-      <!-- 40-60 word direct answer -->
-      <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        A PEC do fim da escala 6x1 propõe a redução da jornada máxima semanal de 44h para 40h e a garantia de dois dias de descanso. Aprovada na Câmara dos Deputados em 27/05/2026, a proposta tramita no Senado Federal e ainda não está em vigor. A mudança não extingue horas extras.
-      </p>
-      <div class="p-4 rounded-xl mb-4" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline);">
-        <p class="mono-eyebrow mb-1">STATUS LEGISLATIVO OFICIAL ({legalStatus.lastReviewedFormatted})</p>
-        <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
-          <strong>Situação:</strong> {legalStatus.pec6x1.statusSummary}
-        </p>
-        <p class="text-xs sm:text-sm leading-relaxed mt-2" style="color: var(--color-g-body);">
-          {legalStatus.pec6x1.statusDetail}
-        </p>
-      </div>
-      <p class="text-sm sm:text-base leading-relaxed mb-3" style="color: var(--color-g-body);">
-        <strong>O que muda concretamente no cálculo das horas extras?</strong>
-      </p>
-      <ul class="list-disc pl-5 space-y-2 text-xs sm:text-sm leading-relaxed" style="color: var(--color-g-body);">
-        <li>
-          <strong>Redução do Divisor Salarial (de 220 para 200):</strong> Com a redução da carga semanal de 44h para 40h mantendo-se a irredutibilidade salarial constitucional, o divisor cai para 200. Isso faz o valor da sua hora normal subir exatamente 10%, o que eleva na mesma proporção o valor de cada hora extra recebida.
-        </li>
-        <li>
-          <strong>Novo Gatilho de Hora Extra:</strong> Horas excedentes passarão a ser contabilizadas a partir da 41ª hora semanal, extinguindo a exigência de labor de 44 horas para disparo do adicional extraordinário.
-        </li>
-      </ul>
-      <p class="text-sm sm:text-base leading-relaxed mt-3" style="color: var(--color-g-body);">
-        Na nossa ferramenta, você já pode alternar a qualquer momento para a opção de <strong>40 horas semanais (Divisor 200)</strong> para simular o impacto dessa futura transição na sua remuneração.
-      </p>
-    </section>
-
-    <!-- SEÇÃO 9: Por que usar esta calculadora (comparativo e vantagens) -->
+    <!-- SEÇÃO 8: Por que usar esta calculadora de horas extras online -->
     <section id="por-que-usar-esta-calculadora" aria-labelledby="h2-por-que-usar">
       <h2 id="h2-por-que-usar" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
-        Por que usar esta calculadora de horas extras
+        Por que usar esta calculadora de horas extras online
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        Esta calculadora de horas extras online processa 100% dos cálculos no navegador com privacidade absoluta, sem envio de dados a servidores. Ela integra DSR automático, suporte nativo a minutos fracionados, predefinições de escalas, gráfico diário e exportação direta de relatório em PDF para conferência com o holerite.
-      </p>
-      <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        Para entender por que a nossa ferramenta é a escolha mais confiável para trabalhadores, contadores e departamentos de recursos humanos, compare os métodos com total transparência:
+        Esta <strong>calculadora de horas extras</strong> processa todos os cálculos diretamente no navegador do seu dispositivo, garantindo privacidade integral aos seus dados salariais. O sistema reúne integração com DSR, suporte a minutos, predefinições de escalas e exportação em PDF.
       </p>
 
-      <!-- Tabela Comparativa Honesta -->
       <div class="overflow-x-auto mb-6">
         <table class="w-full text-xs sm:text-sm border-collapse" style="background: var(--color-g-elevated); border: 1px solid var(--color-g-hairline); border-radius: 8px;">
           <thead>
             <tr style="border-bottom: 2px solid var(--color-g-hairline); background: var(--color-g-canvas);">
               <th class="p-3 text-left font-semibold">Recurso / Critério</th>
-              <th class="p-3 text-center font-semibold" style="color: var(--color-g-link);">Esta Calculadora</th>
+              <th class="p-3 text-center font-semibold" style="color: var(--color-g-link);">Esta Ferramenta</th>
               <th class="p-3 text-center font-semibold">Planilha Excel</th>
               <th class="p-3 text-center font-semibold">Cálculo Manual</th>
             </tr>
@@ -331,50 +260,38 @@ import { legalStatus } from '../data/legal-status';
           <tbody class="divide-y text-xs sm:text-sm" style="border-color: var(--color-g-hairline);">
             <tr>
               <td class="p-3 font-medium">DSR automático integrado</td>
-              <td class="p-3 text-center font-bold text-emerald-600">Sim (Lei 605/49)</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Exige fórmulas manuais</td>
-              <td class="p-3 text-center text-rose-500 font-semibold">Difícil e sujeito a erro</td>
+              <td class="p-3 text-center font-bold text-emerald-600">Sim, configurável</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Exige fórmulas</td>
+              <td class="p-3 text-center text-rose-500 font-semibold">Sujeito a erros</td>
             </tr>
             <tr>
-              <td class="p-3 font-medium">Divisores CLT (220, 200, 180, 150)</td>
-              <td class="p-3 text-center font-bold text-emerald-600">Sim, comutável</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Requer configuração</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Divisão manual</td>
+              <td class="p-3 font-medium">Divisores CLT (220, 210, 200, 180, 150)</td>
+              <td class="p-3 text-center font-bold text-emerald-600">Sim, instantâneo</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Configuração manual</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Cálculo manual</td>
             </tr>
             <tr>
               <td class="p-3 font-medium">Suporte a horas e minutos (ex: 8h48)</td>
-              <td class="p-3 text-center font-bold text-emerald-600">Sim, direto na grade</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Requer conversão sexagesimal</td>
-              <td class="p-3 text-center text-rose-500 font-semibold">Muito trabalhoso</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-medium">Visão 1 sem / 2 sem / mensal / anual</td>
-              <td class="p-3 text-center font-bold text-emerald-600">Sim, em 1 clique</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Exige múltiplas abas</td>
-              <td class="p-3 text-center text-rose-500 font-semibold">Inviável no papel</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-medium">Gráfico de ganhos diários</td>
-              <td class="p-3 text-center font-bold text-emerald-600">Sim, Canvas dinâmico</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Necessita criar gráficos</td>
-              <td class="p-3 text-center text-rose-500 font-semibold">Inexistente</td>
+              <td class="p-3 text-center font-bold text-emerald-600">Sim, na grade</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Requer conversão</td>
+              <td class="p-3 text-center text-rose-500 font-semibold">Trabalhoso</td>
             </tr>
             <tr>
               <td class="p-3 font-medium">Exportação em PDF detalhada</td>
-              <td class="p-3 text-center font-bold text-emerald-600">Sim, relatório pronto</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Depende de formatação</td>
+              <td class="p-3 text-center font-bold text-emerald-600">Sim, em 1 clique</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Requer formatação</td>
               <td class="p-3 text-center text-rose-500 font-semibold">Não possui</td>
             </tr>
             <tr>
-              <td class="p-3 font-medium">Privacidade e dados salvos</td>
-              <td class="p-3 text-center font-bold text-emerald-600">100% no navegador (Client-side)</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Salvo localmente</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Anotação em papel</td>
+              <td class="p-3 font-medium">Privacidade dos dados salariais</td>
+              <td class="p-3 text-center font-bold text-emerald-600">100% no navegador</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Arquivo local</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Papel físico</td>
             </tr>
             <tr>
               <td class="p-3 font-medium">Gratuito e sem cadastro</td>
-              <td class="p-3 text-center font-bold text-emerald-600">Sim, acesso imediato</td>
-              <td class="p-3 text-center" style="color: var(--color-g-body);">Exige licença do Office</td>
+              <td class="p-3 text-center font-bold text-emerald-600">Sim, livre acesso</td>
+              <td class="p-3 text-center" style="color: var(--color-g-body);">Requer software</td>
               <td class="p-3 text-center" style="color: var(--color-g-body);">Gratuito</td>
             </tr>
           </tbody>
@@ -382,17 +299,13 @@ import { legalStatus } from '../data/legal-status';
       </div>
     </section>
 
-    <!-- SEÇÃO 10: Metodologia e fontes legais -->
+    <!-- SEÇÃO 9: Metodologia e fontes legais -->
     <section id="metodologia-e-fontes" aria-labelledby="h2-metodologia">
       <h2 id="h2-metodologia" class="text-xl sm:text-2xl font-semibold mb-4" style="color: var(--color-g-ink);">
-        Metodologia e fontes legais
+        Metodologia e fontes legais verificadas
       </h2>
-      <!-- 40-60 word direct answer -->
       <p class="text-sm sm:text-base leading-relaxed mb-4 p-4 rounded-lg font-medium" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-ink);">
-        Nossa metodologia segue estritamente a Consolidação das Leis do Trabalho (CLT), a Constituição Federal de 1988, a Lei 605/1949 e as Súmulas consolidadas do Tribunal Superior do Trabalho (TST). Os cálculos utilizam divisores salariais formais e contagem legal de dias úteis com inclusão de sábados.
-      </p>
-      <p class="text-sm sm:text-base leading-relaxed mb-4" style="color: var(--color-g-body);">
-        Para assegurar máxima transparência e permitir a validação jurídica dos seus direitos, listamos as fontes legislativas e normativas primárias que parametrizam nossa ferramenta:
+        Nossa metodologia fundamenta-se na CLT (Decreto-Lei nº 5.452/1943), na Constituição Federal de 1988, na Lei nº 605/1949 e nas Súmulas 146, 172 e 264 do Tribunal Superior do Trabalho (TST), aplicando divisores oficiais e a apuração legal de repousos remunerados.
       </p>
       <ul class="space-y-2 mb-6">
         {legalStatus.sources.map(src => (
@@ -405,20 +318,20 @@ import { legalStatus } from '../data/legal-status';
         ))}
       </ul>
       <p class="text-xs italic leading-relaxed p-3 rounded-lg" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); color: var(--color-g-body);">
-        *Aviso de Responsabilidade:* As demonstrações e estimativas geradas por esta plataforma têm caráter informativo e educacional. Não substituem parecer jurídico individualizado, assistência sindical ou homologação contábil oficial da sua folha de pagamento.
+        <strong>Aviso de responsabilidade:</strong> Os cálculos desta ferramenta têm caráter orientativo e educativo, não substituindo parecer contábil individualizado ou consultoria jurídica trabalhista.
       </p>
     </section>
 
-    <!-- SEÇÃO 11: English Guide (Isolada, 2-3 frases com link para calculadora) -->
+    <!-- SEÇÃO 10: English Guide (Overtime in Brazil) -->
     <section lang="en" class="p-5 rounded-xl border border-dashed text-xs leading-relaxed" style="background: var(--color-g-canvas); border-color: var(--color-g-hairline); color: var(--color-g-body);">
-      <h3 class="text-xs font-semibold uppercase tracking-wider mb-2 font-mono" style="color: var(--color-g-ink);">
-        English Summary: Brazilian Overtime Regulations (CLT)
-      </h3>
+      <h2 class="text-xs font-semibold uppercase tracking-wider mb-2 font-mono" style="color: var(--color-g-ink);">
+        English Guide: How to Calculate Overtime in Brazil (CLT)
+      </h2>
       <p class="mb-2">
-        If you need to <strong>calculate overtime online</strong> according to Brazilian labor law (CLT), standard full-time employment follows up to 44 weekly hours, with a minimum mandatory premium of <strong>50% (1.5×)</strong> on weekdays and <strong>100% (2.0×)</strong> on Sundays and holidays.
+        If you need to <strong>calculate overtime online</strong> according to Brazilian labor legislation (CLT), standard full-time employment follows up to 44 hours per week, with a mandatory minimum overtime premium of <strong>50% (1.5×)</strong> on regular workdays and <strong>100% (2.0×)</strong> on Sundays and statutory holidays.
       </p>
       <p>
-        To learn <strong>how to calculate overtime</strong> and paid weekly rest (DSR) with custom divisors and minute precision, explore our free interactive <a href="#calculadora" class="font-semibold underline" style="color: var(--color-g-link);">overtime calculator above</a>.
+        In addition, habitual overtime requires paid weekly rest reflections (DSR). To learn <strong>how to calculate overtime</strong> with custom multipliers and exact minute precision, use our free interactive <a href="#calculadora" class="font-semibold underline" style="color: var(--color-g-link);">overtime calculator above</a>.
       </p>
     </section>
 

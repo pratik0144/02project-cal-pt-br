@@ -40,15 +40,15 @@ const verifiedFeatures = [
   "Cálculo de hora extra a 50% para dias úteis e sábados",
   "Cálculo de hora extra a 100% para domingos e feriados",
   "Multiplicador customizável de horas extras para convenções coletivas",
-  "Cálculo automático de DSR sobre horas extras (Lei nº 605/1949 e Súmula 172 TST)",
-  "Entrada por salário mensal bruto com divisores CLT (220, 200, 180 e 150)",
+  "Cálculo automático de DSR sobre horas extras (prática consolidada do TST e Súmula 172)",
+  "Entrada por salário mensal bruto com divisores CLT (220, 210, 200, 180 e 150)",
   "Entrada direta por valor da hora base com controle deslizante",
   "Grade semanal com suporte integrado a horas e minutos",
   "Predefinições rápidas de jornada (5x10, 5x8h48 compensado 44h, 6x8h, 5x8h, 12x36)",
   "Visualização de períodos: 1 semana, 2 semanas, mensal e anual",
-  "Gráfico interativo de ganhos diários em HTML5 Canvas",
+  "Gráfico interativo de ganhos diários",
   "Exportação de relatório e espelho de cálculo em PDF",
-  "Processamento 100% client-side no navegador com sigilo total de dados",
+  "Processamento 100% client-side no navegador (seus dados salariais não saem do navegador)",
   "Modo escuro e claro integrado",
   "Acesso gratuito sem necessidade de cadastro"
 ];
@@ -154,9 +154,8 @@ const jsonLd = {
     <meta name="apple-mobile-web-app-title" content="HorasExtras" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Canonical & Language Alternate (strictly pt-BR self-referencing, no cross-jurisdiction hreflang) -->
+    <!-- Canonical & Sitemap -->
     <link rel="canonical" href={canonicalUrl} />
-    <link rel="alternate" hreflang="pt-BR" href={canonicalUrl} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Open Graph -->
@@ -178,10 +177,10 @@ const jsonLd = {
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content="Calculadora de Horas Extras Online" />
 
-    <!-- Typography: Preconnect & Swap for Performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <!-- Preload Self-Hosted Critical Fonts -->
+    <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/jetbrains-mono-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
