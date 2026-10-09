@@ -16,8 +16,8 @@ export const faqs: FAQItem[] = [
     answer: "Para calcular horas extras, divida seu salário bruto pelo divisor da sua jornada (220 para 44h semanais) para obter o valor da hora normal. Em seguida, multiplique a hora normal pelo adicional devido: 1,5 para 50% ou 2,0 para 100%. Por fim, multiplique esse valor pela quantidade de horas extras trabalhadas no mês. Por exemplo: com salário de R$ 2.200,00 na jornada de 44h, a hora normal é R$ 10,00 (2.200 ÷ 220). Dez horas extras com adicional de 50% totalizam R$ 150,00 (10 × R$ 10,00 × 1,5). Nossa calculadora online executa esse cálculo automaticamente."
   },
   {
-    question: "How to calculate DSR on overtime pay?",
-    answer: "To calculate DSR (Paid Weekly Rest / Descanso Semanal Remunerado) on overtime pay under Brazilian labor law, use the official statutory formula: DSR = (Total Overtime Earnings in Month ÷ Business Days in Month) × (Sundays + Holidays). Under established labor court jurisprudence (TST Súmula 172), Saturdays count as working days for DSR apportionment, yielding a standard ratio of 26 business days to 4 rest days in a commercial month. For example, if you earned R$ 150.00 in overtime, your DSR is (R$ 150.00 ÷ 26) × 4 = R$ 23.08, bringing total overtime pay to R$ 173.08."
+    question: "O que é DSR e por que ele incide sobre as horas extras?",
+    answer: "O DSR (Descanso Semanal Remunerado) é o direito a um repouso semanal remunerado garantido pela Lei nº 605/1949. Quando o trabalhador realiza horas extras com habitualidade, a Súmula 172 do TST determina que essas horas extraordinárias reflitam no valor pago pelo repouso semanal. O cálculo é feito dividindo o valor total das horas extras do mês pelos dias úteis e multiplicando pelo número de domingos e feriados, considerando o sábado como dia útil."
   },
   {
     question: "Como calcular o DSR sobre horas extras?",
@@ -36,16 +36,16 @@ export const faqs: FAQItem[] = [
     answer: "Para calcular as horas extras trabalhadas a partir do espelho de ponto, siga quatro etapas: 1) Apure as horas diárias efetivas subtraindo o horário de entrada do horário de saída e descontando o intervalo de almoço; 2) Converta os minutos em fração decimal dividindo-os por 60 (ex: 30min = 0,5h; 48min = 0,8h); 3) Compare o total trabalhado no dia ou na semana com a jornada contratual (habitualmente 8h diárias e 44h semanais) para identificar as horas excedentes; 4) Multiplique as horas excedentes pelo salário-hora acrescido do adicional de 50% ou 100%."
   },
   {
-    question: "How to calculate overtime online?",
-    answer: "To calculate overtime online under Brazilian CLT regulations, enter your monthly gross salary or base hourly rate into our free calculator, choose your standard weekly workweek divisor (220 for 44h, 200 for 40h, or 180 for 36h), and input your worked hours and minutes. The tool automatically computes 50% weekday overtime, 100% Sunday/holiday double-time, and mandatory paid weekly rest (DSR) in real time with 100% browser-side privacy and PDF export."
+    question: "Como calcular horas extras online?",
+    answer: "Para calcular horas extras online de acordo com as regras da CLT, insira seu salário bruto mensal ou valor da hora base em nossa calculadora gratuita, escolha o divisor da sua jornada de trabalho (220 para 44h, 200 para 40h ou 180 para 36h) e preencha as horas e minutos trabalhados em cada dia. A ferramenta calcula automaticamente as horas extras a 50% em dias úteis, 100% em domingos e feriados, e o reflexo obrigatório do DSR em tempo real, com total privacidade no seu navegador e opção de exportação em PDF."
   },
   {
-    question: "What is the legal overtime rate in Brazil under CLT?",
-    answer: "Under Brazilian labor law (Article 7, XVI of the Federal Constitution and Article 59 of the CLT), the statutory minimum overtime premium is 50% above the regular hourly rate for hours worked on standard workdays (Monday through Saturday). For hours worked on Sundays and national or religious holidays without compensatory time off, the statutory rate is 100% (double pay) under Law 605/1949 and TST Súmula 146. Collective labor agreements may stipulate higher premium percentages."
+    question: "Qual é o percentual legal de hora extra pela CLT?",
+    answer: "Pela legislação trabalhista brasileira (Artigo 7º, XVI da Constituição Federal e Artigo 59 da CLT), o adicional legal mínimo de horas extras é de 50% sobre o valor da hora normal para dias úteis (segunda a sábado). Já para o trabalho prestado em domingos e feriados civis ou religiosos sem folga compensatória, o adicional legal é de 100% (pagamento em dobro), conforme a Lei nº 605/1949 e a Súmula 146 do TST. Convenções e acordos coletivos de trabalho podem estabelecer percentuais ainda maiores."
   },
   {
-    question: "What is the maximum overtime limit allowed per day in Brazil?",
-    answer: "Under Article 59 of the Brazilian Consolidation of Labor Laws (CLT), daily overtime is strictly capped at a maximum of 2 hours per day, provided there is a written individual agreement or collective bargaining agreement. Consequently, an employee on a standard 8-hour daily schedule can work a maximum of 10 hours in a single day. Exceeding the 2-hour daily limit is only authorized in exceptional force majeure or urgent emergency situations under CLT Article 61."
+    question: "Quantas horas extras um trabalhador pode fazer por dia?",
+    answer: "Pelo Artigo 59 da CLT, o limite máximo permitido de horas extras é de 2 horas por dia, mediante acordo individual escrito ou convenção coletiva. Dessa forma, um empregado com jornada padrão de 8 horas diárias pode cumprir no máximo 10 horas totais de trabalho em um único dia. O trabalho além desse limite só é admitido em circunstâncias excepcionais de necessidade imperiosa ou força maior, previstas no Artigo 61 da CLT."
   },
   {
     question: "Como funciona a calculadora de horas extras com minutos?",

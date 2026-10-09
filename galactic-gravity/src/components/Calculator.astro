@@ -37,12 +37,12 @@ const dayFullNames = [
     <div class="card-lg max-w-5xl mx-auto p-3.5 sm:p-6 lg:p-8">
       <!-- Controls Row: Overtime Multiplier + DSR side-by-side, and Salary Mode -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-        <!-- Col 1: Overtime Multiplier & DSR toggle -->
+        <!-- Col 1: Overtime Multipliers, DSR & OT Mode -->
         <div>
           <div class="flex items-start gap-4 sm:gap-6 flex-wrap">
-            <!-- Overtime Multiplier -->
+            <!-- Overtime Multiplier (Weekday) -->
             <div>
-              <label for="overtime-mult" class="calc-label">Multiplicador HE</label>
+              <label for="overtime-mult" class="calc-label">Mult. Dias Úteis</label>
               <div class="relative" style="width: 110px;">
                 <input
                   type="text"
@@ -50,7 +50,24 @@ const dayFullNames = [
                   id="overtime-mult"
                   class="calc-input"
                   value="1,5"
-                  aria-label="Multiplicador de horas extras"
+                  aria-label="Multiplicador de horas extras dias úteis"
+                  style="padding-right: 26px; font-family: var(--font-mono);"
+                />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 14px; font-weight: 600; pointer-events: none;">×</span>
+              </div>
+            </div>
+
+            <!-- Sunday/Holiday Multiplier -->
+            <div>
+              <label for="sunday-mult" class="calc-label">Mult. DOM/Feriado</label>
+              <div class="relative" style="width: 110px;">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="sunday-mult"
+                  class="calc-input"
+                  value="2,0"
+                  aria-label="Multiplicador de horas extras domingos e feriados"
                   style="padding-right: 26px; font-family: var(--font-mono);"
                 />
                 <span class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 14px; font-weight: 600; pointer-events: none;">×</span>
@@ -80,61 +97,40 @@ const dayFullNames = [
               <input type="number" id="dsr-sundays" class="calc-input mt-auto" value="4" min="0" max="15" />
             </div>
           </div>
-          <div id="dsr-formula" class="mt-2.5 space-y-0.5 max-w-[340px]" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 10px;">
-            <p>DSR = (Total HE ÷ Dias Úteis) × Domingos e Feriados</p>
-            <p style="color: var(--color-g-faint); font-style: italic;">Padrão: sábados contam como dias úteis conforme a prática consolidada do TST. Repousos são domingos e feriados.</p>
+          <!-- DSR Info: exclamation icon with tooltip -->
+          <div id="dsr-formula" class="mt-2 max-w-[340px] relative">
+            <button id="dsr-info-btn" type="button" class="dsr-info-btn" aria-label="Informações sobre a fórmula do DSR" title="Como o DSR é calculado">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+              <span style="font-size: 11px; font-weight: 500;">Como o DSR é calculado?</span>
+            </button>
+            <div id="dsr-info-popup" class="dsr-info-popup hidden" role="tooltip">
+              <p style="font-weight: 600; margin-bottom: 4px;">DSR = (Total HE ÷ Dias Úteis) × Domingos e Feriados</p>
+              <p style="color: var(--color-g-faint); font-style: italic;">Padrão: sábados contam como dias úteis conforme a prática consolidada do TST. Repousos são domingos e feriados.</p>
+            </div>
+          </div>
+
+          <!-- Overtime Mode Toggle: Weekly vs Daily -->
+          <div class="mt-4 flex items-center gap-3 flex-wrap">
+            <span class="calc-label mb-0" style="font-size: 11px;">Calcular HE por:</span>
+            <div class="salary-mode-switch" role="tablist" aria-label="Modo de cálculo de horas extras">
+              <button type="button" id="ot-mode-weekly-btn" class="salary-mode-pill salary-mode-pill-active" role="tab" aria-selected="true">Semana</button>
+              <button type="button" id="ot-mode-daily-btn" class="salary-mode-pill" role="tab" aria-selected="false">Dia (8h)</button>
+            </div>
           </div>
         </div>
 
-        <!-- Col 2: Salary Input Mode (Salário Mensal ou Valor da Hora) -->
+        <!-- Col 2: Salary Input Mode (Valor da Hora ou Salário Mensal) -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <span class="calc-label mb-0">Base Salarial</span>
             <div class="salary-mode-switch" role="tablist" aria-label="Forma de entrada do salário">
-              <button type="button" id="mode-monthly-btn" class="salary-mode-pill salary-mode-pill-active" role="tab" aria-selected="true">Salário Mensal</button>
-              <button type="button" id="mode-hourly-btn" class="salary-mode-pill" role="tab" aria-selected="false">Valor da Hora</button>
+              <button type="button" id="mode-hourly-btn" class="salary-mode-pill salary-mode-pill-active" role="tab" aria-selected="true">Valor da Hora</button>
+              <button type="button" id="mode-monthly-btn" class="salary-mode-pill" role="tab" aria-selected="false">Salário Mensal</button>
             </div>
           </div>
 
-          <!-- Mode 1: Salário Mensal (Default) -->
-          <div id="monthly-salary-wrap">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label for="monthly-salary" class="calc-sublabel">Salário Bruto Mensal</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 13px; font-weight: 500;">R$</span>
-                  <input
-                    type="text"
-                    inputmode="decimal"
-                    id="monthly-salary"
-                    value="4.400,00"
-                    class="calc-input"
-                    aria-label="Salário bruto mensal"
-                    style="padding-left: 34px;"
-                  />
-                </div>
-              </div>
-              <div>
-                <label for="journey-divisor" class="calc-sublabel">Jornada / Divisor</label>
-                <select id="journey-divisor" class="calc-select" style="font-size: 12.5px;">
-                  <option value="220" data-threshold="44" selected>44h · divisor 220 (CLT)</option>
-                  <option value="210" data-threshold="42">42h · divisor 210 (PEC transição)</option>
-                  <option value="200" data-threshold="40">40h · divisor 200 (PEC 6x1)</option>
-                  <option value="180" data-threshold="36">36h · divisor 180 (6h/dia)</option>
-                  <option value="150" data-threshold="30">30h · divisor 150</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex items-center justify-between mt-2 px-2.5 py-1.5 rounded-lg" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); font-size: 11px;">
-              <span style="color: var(--color-g-mute);">Salário/Hora apurado:</span>
-              <span id="rate-calc-badge" class="font-mono font-semibold" style="color: var(--color-g-link);">
-                R$ 20,00/h <span class="font-normal text-[10px]" style="color: var(--color-g-mute);">(R$ 4.400,00 ÷ 220)</span>
-              </span>
-            </div>
-          </div>
-
-          <!-- Mode 2: Valor da Hora Base -->
-          <div id="hourly-rate-wrap" class="hidden">
+          <!-- Mode 1: Valor da Hora Base (Default) -->
+          <div id="hourly-rate-wrap">
             <div class="flex items-center justify-between mb-1">
               <label for="hourly-rate" class="calc-sublabel mb-0">Salário/Hora Base</label>
               <div class="flex items-center gap-1.5 text-[11px]" style="color: var(--color-g-mute);">
@@ -171,6 +167,43 @@ const dayFullNames = [
                 class="calc-slider flex-1 cursor-pointer hidden sm:block"
                 aria-label="Controle deslizante de salário/hora"
               />
+            </div>
+          </div>
+
+          <!-- Mode 2: Salário Mensal -->
+          <div id="monthly-salary-wrap" class="hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label for="monthly-salary" class="calc-sublabel">Salário Bruto Mensal</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-g-mute); font-family: var(--font-mono); font-size: 13px; font-weight: 500;">R$</span>
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    id="monthly-salary"
+                    value="4.400,00"
+                    class="calc-input"
+                    aria-label="Salário bruto mensal"
+                    style="padding-left: 34px;"
+                  />
+                </div>
+              </div>
+              <div>
+                <label for="journey-divisor" class="calc-sublabel">Jornada / Divisor</label>
+                <select id="journey-divisor" class="calc-select" style="font-size: 12.5px;">
+                  <option value="220" data-threshold="44" selected>44h · divisor 220 (CLT)</option>
+                  <option value="210" data-threshold="42">42h · divisor 210 (PEC transição)</option>
+                  <option value="200" data-threshold="40">40h · divisor 200 (PEC 6x1)</option>
+                  <option value="180" data-threshold="36">36h · divisor 180 (6h/dia)</option>
+                  <option value="150" data-threshold="30">30h · divisor 150</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-2 px-2.5 py-1.5 rounded-lg" style="background: var(--color-g-canvas); border: 1px solid var(--color-g-hairline); font-size: 11px;">
+              <span style="color: var(--color-g-mute);">Salário/Hora apurado:</span>
+              <span id="rate-calc-badge" class="font-mono font-semibold" style="color: var(--color-g-link);">
+                R$ 20,00/h <span class="font-normal text-[10px]" style="color: var(--color-g-mute);">(R$ 4.400,00 ÷ 220)</span>
+              </span>
             </div>
           </div>
         </div>
@@ -384,7 +417,7 @@ const dayFullNames = [
     width: 100%;
     height: 40px;
     padding: 0 12px;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--color-g-ink);
     background: var(--color-g-elevated);
     border: 1px solid var(--color-g-hairline);
@@ -604,8 +637,8 @@ const dayFullNames = [
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     color: var(--color-g-mute);
     background: var(--color-g-elevated);
@@ -627,8 +660,8 @@ const dayFullNames = [
   }
   @media (min-width: 640px) {
     .hour-btn {
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
     }
   }
   .hour-btn:hover {
@@ -855,6 +888,43 @@ const dayFullNames = [
     border-color: var(--color-g-link);
     color: var(--color-g-link);
   }
+
+  /* ── DSR Info Tooltip ── */
+  .dsr-info-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border: 1px solid var(--color-g-hairline);
+    border-radius: var(--radius-pill-cat);
+    background: var(--color-g-elevated);
+    color: var(--color-g-mute);
+    cursor: pointer;
+    transition: all 0.15s;
+    touch-action: manipulation;
+    font-family: var(--font-mono);
+  }
+  .dsr-info-btn:hover {
+    color: var(--color-g-link);
+    border-color: var(--color-g-link);
+  }
+  .dsr-info-popup {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    z-index: 20;
+    padding: 12px 14px;
+    background: var(--color-g-elevated);
+    border: 1px solid var(--color-g-hairline);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-g-mute);
+    min-width: 280px;
+    max-width: 340px;
+    line-height: 1.5;
+  }
 </style>
 
 <script>
@@ -864,26 +934,62 @@ const dayFullNames = [
   interface DB { day: string; hours: number; straight: number; overtime: number; straightPay: number; overtimePay: number; totalPay: number }
   interface R { totalHours: number; straightHours: number; overtimeHours: number; straightPay: number; overtimePay: number; grossPay: number; dailyBreakdown: DB[] }
 
-  // ── Engine: simple weekly threshold (CLT 44h ou 40h) ──
-  function calcBrazil(days: D[], rate: number, threshold: number, mult: number): R {
+  // ── Engine: weekly threshold OR daily limit, with per-day multiplier ──
+  function calcBrazil(days: D[], rate: number, threshold: number, mult: number, sundayMult: number, dailyMode: boolean): R {
+    if (dailyMode) {
+      // Daily mode: OT = hours exceeding 8h per day (CLT Art. 59)
+      const dailyLimit = 8;
+      let totalHours = 0, straightHours = 0, overtimeHours = 0;
+      let straightPay = 0, overtimePay = 0;
+      const db: DB[] = days.map((d, i) => {
+        const h = d.hours;
+        const ot = Math.max(0, h - dailyLimit);
+        const str = h - ot;
+        const dayMult = i === 6 ? sundayMult : mult; // Sunday uses sundayMult
+        totalHours += h;
+        straightHours += str;
+        overtimeHours += ot;
+        const sp = str * rate;
+        const op = ot * rate * dayMult;
+        straightPay += sp;
+        overtimePay += op;
+        return {
+          day: d.day, hours: h, straight: str, overtime: ot,
+          straightPay: sp, overtimePay: op, totalPay: sp + op
+        };
+      });
+      return {
+        totalHours, straightHours, overtimeHours,
+        straightPay, overtimePay,
+        grossPay: straightPay + overtimePay,
+        dailyBreakdown: db
+      };
+    }
+
+    // Weekly mode: OT = hours exceeding weekly threshold (original logic)
     const tot = days.reduce((s, d) => s + d.hours, 0);
     const ot = Math.max(0, tot - threshold);
     const str = tot - ot;
     let rem = str;
-    const db: DB[] = days.map(d => {
+    let straightPay = 0, overtimePay = 0;
+    const db: DB[] = days.map((d, i) => {
       const ds = Math.min(d.hours, rem);
       const dot = d.hours - ds;
       rem -= ds;
+      const dayMult = i === 6 ? sundayMult : mult; // Sunday uses sundayMult
+      const sp = ds * rate;
+      const op = dot * rate * dayMult;
+      straightPay += sp;
+      overtimePay += op;
       return {
         day: d.day, hours: d.hours, straight: ds, overtime: dot,
-        straightPay: ds * rate, overtimePay: dot * rate * mult,
-        totalPay: ds * rate + dot * rate * mult
+        straightPay: sp, overtimePay: op, totalPay: sp + op
       };
     });
     return {
       totalHours: tot, straightHours: str, overtimeHours: ot,
-      straightPay: str * rate, overtimePay: ot * rate * mult,
-      grossPay: str * rate + ot * rate * mult,
+      straightPay, overtimePay,
+      grossPay: straightPay + overtimePay,
       dailyBreakdown: db
     };
   }
@@ -931,8 +1037,10 @@ const dayFullNames = [
   let currentWeek = 0;
   let period = 1;
   let multiplier = 1.5;
+  let sundayMult = 2.0;
   let dsrEnabled = true;
-  let salaryMode: 'monthly' | 'hourly' = 'monthly';
+  let dailyOtMode = false;
+  let salaryMode: 'monthly' | 'hourly' = 'hourly';
 
   const presets: Record<string, DayTime[]> = {
     extended:   [{ h: 10, m: 0 }, { h: 10, m: 0 }, { h: 10, m: 0 }, { h: 10, m: 0 }, { h: 10, m: 0 }, { h: 0, m: 0 }, { h: 0, m: 0 }],
@@ -989,10 +1097,20 @@ const dayFullNames = [
   const hoursGrid = $('hours-grid') as HTMLElement;
   const weekPrevBtn = $('week-prev') as HTMLButtonElement;
   const weekNextBtn = $('week-next') as HTMLButtonElement;
+  const sundayMultIn = $('sunday-mult') as HTMLInputElement;
+  const otModeWeeklyBtn = $('ot-mode-weekly-btn') as HTMLButtonElement;
+  const otModeDailyBtn = $('ot-mode-daily-btn') as HTMLButtonElement;
+  const dsrInfoBtn = $('dsr-info-btn') as HTMLButtonElement;
+  const dsrInfoPopup = $('dsr-info-popup') as HTMLElement;
 
   function getMultLabel(): string {
     if (multiplier % 1 === 0) return String(multiplier);
     return multiplier.toFixed(1).replace('.', ',');
+  }
+
+  function getSundayMultLabel(): string {
+    if (sundayMult % 1 === 0) return String(sundayMult);
+    return sundayMult.toFixed(1).replace('.', ',');
   }
 
   function getEffectiveRate(): number {
@@ -1033,6 +1151,7 @@ const dayFullNames = [
   });
 
   modeHourlyBtn.addEventListener('click', () => {
+    const eff = getEffectiveRate();
     salaryMode = 'hourly';
     modeHourlyBtn.classList.add('salary-mode-pill-active');
     modeMonthlyBtn.classList.remove('salary-mode-pill-active');
@@ -1041,7 +1160,6 @@ const dayFullNames = [
     hourlyWrap.classList.remove('hidden');
     monthlyWrap.classList.add('hidden');
 
-    const eff = getEffectiveRate();
     if (eff > 0 && !isNaN(eff)) {
       rateIn.value = fmtPtBr(eff);
       slider.value = eff.toFixed(2);
@@ -1232,6 +1350,44 @@ const dayFullNames = [
     multIn.value = getMultLabel();
   });
 
+  // ── Sunday Multiplier input ──
+  sundayMultIn.addEventListener('input', () => {
+    sundayMult = Math.max(1, Math.min(4, parsePtBr(sundayMultIn.value) || 2.0));
+    update();
+  });
+  sundayMultIn.addEventListener('blur', () => {
+    sundayMultIn.value = getSundayMultLabel();
+  });
+
+  // ── OT Mode Toggle (Weekly vs Daily) ──
+  otModeWeeklyBtn.addEventListener('click', () => {
+    dailyOtMode = false;
+    otModeWeeklyBtn.classList.add('salary-mode-pill-active');
+    otModeDailyBtn.classList.remove('salary-mode-pill-active');
+    otModeWeeklyBtn.setAttribute('aria-selected', 'true');
+    otModeDailyBtn.setAttribute('aria-selected', 'false');
+    update();
+  });
+  otModeDailyBtn.addEventListener('click', () => {
+    dailyOtMode = true;
+    otModeDailyBtn.classList.add('salary-mode-pill-active');
+    otModeWeeklyBtn.classList.remove('salary-mode-pill-active');
+    otModeDailyBtn.setAttribute('aria-selected', 'true');
+    otModeWeeklyBtn.setAttribute('aria-selected', 'false');
+    update();
+  });
+
+  // ── DSR Info Tooltip ──
+  dsrInfoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dsrInfoPopup.classList.toggle('hidden');
+  });
+  document.addEventListener('click', (e) => {
+    if (!dsrInfoBtn.contains(e.target as Node) && !dsrInfoPopup.contains(e.target as Node)) {
+      dsrInfoPopup.classList.add('hidden');
+    }
+  });
+
   // ── Main update ──
   function update() {
     const rate = getEffectiveRate();
@@ -1248,7 +1404,7 @@ const dayFullNames = [
         const item = weeklyHours[w][i];
         return { day: n, hours: item.h + (item.m / 60) };
       });
-      const r = calcBrazil(days, rate, threshold, multiplier);
+      const r = calcBrazil(days, rate, threshold, multiplier, sundayMult, dailyOtMode);
       sumStraightHours += r.straightHours;
       sumOvertimeHours += r.overtimeHours;
       sumTotalHours += r.totalHours;
@@ -1564,7 +1720,7 @@ const dayFullNames = [
         const item = weeklyHours[w][i];
         return { day: n, hours: item.h + (item.m / 60) };
       });
-      const r = calcBrazil(days, rate, threshold, multiplier);
+      const r = calcBrazil(days, rate, threshold, multiplier, sundayMult, dailyOtMode);
       weekResults.push(r);
       sumSP += r.straightPay; sumOP += r.overtimePay;
       sumSH += r.straightHours; sumOH += r.overtimeHours; sumTH += r.totalHours;
@@ -1599,10 +1755,11 @@ const dayFullNames = [
     const now = new Date();
     const dateStr = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
 
+    const otModeLabel = dailyOtMode ? 'Diário (8h/dia)' : `Semanal (${threshold}h/sem)`;
     let ruleDesc = '';
-    if (multiplier === 1.5) ruleDesc = `CLT Art. 59 – HE 50% (Limite ${threshold}h/sem)`;
-    else if (multiplier === 2) ruleDesc = `CLT Art. 59 – HE 100% (Limite ${threshold}h/sem)`;
-    else ruleDesc = `Multiplicador ${getMultLabel()}× (Limite ${threshold}h/sem)`;
+    if (multiplier === 1.5) ruleDesc = `CLT Art. 59 – HE 50% · DOM ${getSundayMultLabel()}× · ${otModeLabel}`;
+    else if (multiplier === 2) ruleDesc = `CLT Art. 59 – HE 100% · DOM ${getSundayMultLabel()}× · ${otModeLabel}`;
+    else ruleDesc = `Mult. ${getMultLabel()}× · DOM ${getSundayMultLabel()}× · ${otModeLabel}`;
 
     let weekSummaryTable = '';
     if (numWeeks > 1) {
